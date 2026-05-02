@@ -1,4 +1,4 @@
-package org.banco;
+package org.banco.utils;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -20,7 +20,7 @@ public class TopBar extends JPanel {
 
     private Cursor handCursor;
 
-    public TopBar(JFrame ventana, Color colorDefault) {
+    public TopBar(JFrame ventana, Color colorDefault, int Width, int Height) {
 
         handCursor = new Cursor(Cursor.HAND_CURSOR);
 
@@ -28,12 +28,14 @@ public class TopBar extends JPanel {
 
         //Panel TopBar
         this.setLayout(null);
-        this.setBounds(0, 0, 800, 30);
+        this.setBounds(0, 0, Width, Height);
         this.setCursor(handCursor);
+        this.setBackground(colorDefault);
         //Panel botón exit
         panelBtnExit = new JPanel();
-        panelBtnExit.setBounds(747, 0, 57, 30);
+        panelBtnExit.setBounds(Width - 57, 0, 57, 30);
         panelBtnExit.setCursor(handCursor);
+        panelBtnExit.setBackground(colorDefault);
         //Label botón exit
         labelBtnExit = new JLabel("X");
         labelBtnExit.setBounds(0, 0, 57, 30);
