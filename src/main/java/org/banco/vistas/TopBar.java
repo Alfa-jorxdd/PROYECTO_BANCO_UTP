@@ -1,4 +1,4 @@
-package org.banco.utils;
+package org.banco.vistas;
 
 import java.awt.Color;
 import java.awt.Cursor;
@@ -9,33 +9,36 @@ import java.awt.event.MouseMotionAdapter;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 
-public class TopBar extends JPanel {
+public final class TopBar extends JPanel {
 
     private int xMouse, yMouse;
 
-    private JLabel labelBtnExit;
-    private JPanel panelBtnExit;
-    private JFrame ventana;
+    private final JLabel labelBtnExit;
+    private final JPanel panelBtnExit;
+    private final JFrame ventana;
+    private final Color color;
+    private final Cursor handCursor;
 
-    private Cursor handCursor;
+    public TopBar(JFrame ventana) {
 
-    public TopBar(JFrame ventana, Color colorDefault, int Width, int Height) {
-
+        color = UIManager.getColor("Panel.background");
+        
         handCursor = new Cursor(Cursor.HAND_CURSOR);
 
         this.ventana = ventana;
 
         //Panel TopBar
         this.setLayout(null);
-        this.setBounds(0, 0, Width, Height);
+        this.setBounds(0, 0, 1120, 30);
         this.setCursor(handCursor);
-        this.setBackground(colorDefault);
+        this.setBackground(color);
         //Panel botón exit
         panelBtnExit = new JPanel();
-        panelBtnExit.setBounds(Width - 57, 0, 57, 30);
+        panelBtnExit.setBounds(1120 - 57, 0, 57, 30);
         panelBtnExit.setCursor(handCursor);
-        panelBtnExit.setBackground(colorDefault);
+        panelBtnExit.setBackground(color);
         //Label botón exit
         labelBtnExit = new JLabel("X");
         labelBtnExit.setBounds(0, 0, 57, 30);
@@ -47,7 +50,7 @@ public class TopBar extends JPanel {
         this.add(panelBtnExit);
         
         enableDrag();
-        btnExitFuncion(labelBtnExit, colorDefault);
+        btnExitFuncion(labelBtnExit, color);
 
     }
 

@@ -1,4 +1,4 @@
-package org.banco.modelo;
+package org.banco.modelos;
 
 public class Cliente_Cuenta {
     private int idCliente;

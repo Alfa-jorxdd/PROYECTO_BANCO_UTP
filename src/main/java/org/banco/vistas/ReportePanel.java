@@ -1,6 +1,6 @@
-package org.banco.views;
+package org.banco.vistas;
 
-import org.banco.modelo.Banco;
+import org.banco.modelos.Banco;
 
 public class ReportePanel extends javax.swing.JPanel {
 

@@ -1,4 +1,4 @@
-package org.banco.utils;
+package org.banco.modelos.interfaces;
 
 public interface Mantenimiento {
     void agregar();

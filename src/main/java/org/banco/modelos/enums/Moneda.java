@@ -1,7 +1,6 @@
-package org.banco.modelo.enums;
+package org.banco.modelos.enums;
 
 public enum Moneda {
     SOL,
     DOLAR,
-    EURO;
 }

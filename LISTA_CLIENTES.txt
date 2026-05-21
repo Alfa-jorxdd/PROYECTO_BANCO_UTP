@@ -1,6 +1,20 @@
-Anghelo;74324814;1
-Fernando;48147432;2
-Mirla;44413341;1
-Arellys;12345678;2
-Belén;87654321;1
-Bella;09876543;2
+Anghelo Fernando;Torres Ramirez;74324814;987654321;anghelo.torres@gmail.com;1;SOL;ACTIVA
+Fernando Jose;Ramirez Lopez;48147432;912345678;fernando.ramirez@hotmail.com;2;DOLAR;ACTIVA
+Mirla Lucia;Santos Perez;44413341;956781234;mirla.santos@gmail.com;1;SOL;ACTIVA
+Arellys Gabriela;Flores Mendoza;12345678;934567812;arellys.flores@yahoo.com;2;DOLAR;ACTIVA
+Belén Maria;Gutierrez Rios;87654321;978123456;belen.gutierrez@gmail.com;1;SOL;ACTIVA
+Bella Sofia;Mendoza Castro;09876543;945678123;bella.mendoza@hotmail.com;2;SOL;ACTIVA
+Carlos Alberto;Quispe Huanca;52341678;967812345;carlos.quispe@gmail.com;1;SOL;ACTIVA
+Diana Paola;Vargas Salinas;63452789;923456781;diana.vargas@outlook.com;2;DOLAR;ACTIVA
+Eduardo Martin;Silva Torres;74563890;989012345;eduardo.silva@gmail.com;1;SOL;ACTIVA
+Fernanda Isabel;Cruz Paredes;85674901;934501234;fernanda.cruz@hotmail.com;2;DOLAR;ACTIVA
+Gabriel Andres;Rojas Condori;96785012;956123450;gabriel.rojas@gmail.com;1;SOL;ACTIVA
+Hilda Rosa;Paredes Mamani;07896123;912340567;hilda.paredes@yahoo.com;2;DOLAR;ACTIVA
+Ignacio Ramon;Leon Zuniga;18907234;978450678;ignacio.leon@gmail.com;1;SOL;ACTIVA
+Jazmin Valeria;Huanca Espinoza;29018345;945670789;jazmin.huanca@hotmail.com;2;DOLAR;ACTIVA
+Kevin Diego;Mamani Tapia;30129456;967890123;kevin.mamani@gmail.com;1;SOL;ACTIVA
+Laura Alejandra;Condori Villanueva;41230567;923012345;laura.condori@outlook.com;2;DOLAR;ACTIVA
+Manuel Ricardo;Zuniga Chavez;52341678;989123456;manuel.zuniga@gmail.com;1;SOL;ACTIVA
+Natalia Carmen;Espinoza Benites;63452789;934234567;natalia.espinoza@hotmail.com;2;DOLAR;ACTIVA
+Oscar Luis;Tapia Fuentes;74563890;956345678;oscar.tapia@gmail.com;1;SOL;ACTIVA
+Patricia Elena;Villanueva Mora;85674901;912456789;patricia.villanueva@yahoo.com;2;DOLAR;ACTIVA

@@ -115,8 +115,10 @@
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Group type="102" alignment="0" attributes="0">
                           <EmptySpace min="-2" pref="32" max="-2" attributes="0"/>
-                          <Component id="txtBienvenida" min="-2" pref="514" max="-2" attributes="0"/>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <Component id="txtBienvenida" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace max="-2" attributes="0"/>
+                          <Component id="txtTitulo" max="32767" attributes="0"/>
+                          <EmptySpace type="unrelated" max="-2" attributes="0"/>
                           <Component id="txtFecha" min="-2" pref="112" max="-2" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
                       </Group>
@@ -132,7 +134,10 @@
                               </Group>
                               <Group type="102" alignment="0" attributes="0">
                                   <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
-                                  <Component id="txtBienvenida" min="-2" pref="59" max="-2" attributes="0"/>
+                                  <Group type="103" groupAlignment="3" attributes="0">
+                                      <Component id="txtBienvenida" alignment="3" min="-2" pref="59" max="-2" attributes="0"/>
+                                      <Component id="txtTitulo" alignment="3" min="-2" pref="30" max="-2" attributes="0"/>
+                                  </Group>
                               </Group>
                           </Group>
                           <EmptySpace pref="21" max="32767" attributes="0"/>
@@ -143,12 +148,20 @@
               <SubComponents>
                 <Component class="javax.swing.JLabel" name="txtBienvenida">
                   <Properties>
-                    <Property name="text" type="java.lang.String" value="&#xa1;Bienvenido! -&gt; Reportes"/>
+                    <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
+                      <Font name="Segoe UI" size="12" style="1"/>
+                    </Property>
+                    <Property name="text" type="java.lang.String" value="&#xa1;Bienvenido!    -&gt; "/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="txtFecha">
                   <Properties>
                     <Property name="text" type="java.lang.String" value="30 abr. 2026"/>
+                  </Properties>
+                </Component>
+                <Component class="javax.swing.JLabel" name="txtTitulo">
+                  <Properties>
+                    <Property name="text" type="java.lang.String" value="Si"/>
                   </Properties>
                 </Component>
               </SubComponents>
@@ -268,19 +281,6 @@
                 </Component>
               </SubComponents>
             </Container>
-            <Component class="javax.swing.JButton" name="jButton5">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Reportes"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton5ActionPerformed"/>
-              </Events>
-              <Constraints>
-                <Constraint layoutClass="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout" value="org.netbeans.modules.form.compat2.layouts.DesignAbsoluteLayout$AbsoluteConstraintsDescription">
-                  <AbsoluteConstraints x="20" y="470" width="210" height="40"/>
-                </Constraint>
-              </Constraints>
-            </Component>
             <Component class="javax.swing.JButton" name="jButton6">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Operaciones"/>

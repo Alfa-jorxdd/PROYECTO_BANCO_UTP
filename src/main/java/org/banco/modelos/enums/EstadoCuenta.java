@@ -1,9 +1,6 @@
-package org.banco.modelo.enums;
+package org.banco.modelos.enums;
 
 public enum EstadoCuenta {
-    
     ACTIVA,
-    INACTUVA,
     BLOQUEADA;
-    
 }

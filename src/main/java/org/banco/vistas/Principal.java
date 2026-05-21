@@ -1,25 +1,74 @@
-package org.banco.views;
+package org.banco.vistas;
 
-import org.banco.modelo.Banco;
+import javax.swing.table.DefaultTableModel;
+import org.banco.modelos.Cuenta;
+import org.banco.modelos.Banco;
 
-public class Principal extends javax.swing.JPanel {
-    
-    private Banco banco;
+public final class Principal extends javax.swing.JPanel {
+
+    private final Banco banco;
+    private final DefaultTableModel dtm;
+    private final Object[] obj = new Object[4];
 
     public Principal(Banco banco) {
         initComponents();
+        dtm = (DefaultTableModel) tClientesRecientes.getModel();
         InitStyles();
-        
+
         this.banco = banco;
+
+        ponerUltimosClientes();
+        cargarDatosDashboard();
+
     }
-    
-    public void InitStyles(){
-        txtTitulo.putClientProperty( "FlatLaf.styleClass", "h0" );
-        txtClientes.putClientProperty( "FlatLaf.styleClass", "h3" );
-        txtCuentas.putClientProperty( "FlatLaf.styleClass", "h3" );
-        txtOperaciones.putClientProperty( "FlatLaf.styleClass", "h3" );
-        txtSaldo.putClientProperty( "FlatLaf.styleClass", "h3" );
-        
+
+    public void InitStyles() {
+        txtTitulo.putClientProperty("FlatLaf.styleClass", "h0");
+        txtClientes.putClientProperty("FlatLaf.styleClass", "h3");
+        txtCuentas.putClientProperty("FlatLaf.styleClass", "h3");
+        txtOperaciones.putClientProperty("FlatLaf.styleClass", "h3");
+        txtSaldo.putClientProperty("FlatLaf.styleClass", "h3");
+        tClientesRecientes.setShowVerticalLines(true);
+
+    }
+
+    public void cargarDatosDashboard() {
+        numClientes.setText(String.valueOf(banco.getClientes().length - 1));
+        numCuentas.setText(String.valueOf(banco.getCuentas().length - 1));
+        numOperaciones.setText("0");
+        numSaldo.setText("S/" + "0");
+    }
+
+    public void ponerUltimosClientes() {
+
+        dtm.setRowCount(0);
+
+        int ultimo = banco.getClientes().length - 2;
+        int inicio = Math.max(0, ultimo - 19);
+
+        for (int i = ultimo; i >= inicio; i--) {
+            int idCliente = banco.getClientes()[i].getIdCliente();
+            Cuenta[] cuentaCliente = banco.buscarCuentasporIdCLiente(idCliente);
+
+            obj[0] = idCliente;
+            obj[1] = banco.getClientes()[i].getNombres();
+
+            if (cuentaCliente == null || cuentaCliente.length == 0) {
+                obj[2] = "Sin Cuenta";
+                obj[3] = "Sin Estado";
+                dtm.addRow(obj);
+            } else if (cuentaCliente.length > 1) {
+                for (int j = 0; j < cuentaCliente.length; j++) {
+                    obj[2] = cuentaCliente[j].getTipoCuenta();
+                    obj[3] = cuentaCliente[j].getEstadoCuenta();
+                    dtm.addRow(obj);
+                }
+            } else {
+                obj[2] = cuentaCliente[0].getTipoCuenta();
+                obj[3] = cuentaCliente[0].getEstadoCuenta();
+                dtm.addRow(obj);
+            }
+        }
     }
 
     /**
@@ -48,7 +97,7 @@ public class Principal extends javax.swing.JPanel {
         numClientes = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tClientesRecientes = new javax.swing.JTable();
         txtTitulo = new javax.swing.JLabel();
 
         setPreferredSize(new java.awt.Dimension(799, 435));
@@ -96,7 +145,7 @@ public class Principal extends javax.swing.JPanel {
 
         numSaldo.setFont(new java.awt.Font("Segoe UI", 1, 36)); // NOI18N
         numSaldo.setForeground(new java.awt.Color(51, 51, 51));
-        numSaldo.setText("S/. 83k");
+        numSaldo.setText("S/83k");
 
         jLabel3.setForeground(new java.awt.Color(0, 0, 0));
         jLabel3.setText("De todas las cuentas");
@@ -193,7 +242,7 @@ public class Principal extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tClientesRecientes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
                 {null, null, null, null},
@@ -204,7 +253,7 @@ public class Principal extends javax.swing.JPanel {
                 "ID", "Nombre", "Tipo Cuenta", "Estado"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tClientesRecientes);
 
         txtTitulo.setText("Clientes Recientes");
 
@@ -272,11 +321,11 @@ public class Principal extends javax.swing.JPanel {
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
     private javax.swing.JLabel numClientes;
     private javax.swing.JLabel numCuentas;
     private javax.swing.JLabel numOperaciones;
     private javax.swing.JLabel numSaldo;
+    private javax.swing.JTable tClientesRecientes;
     private javax.swing.JLabel txtClientes;
     private javax.swing.JLabel txtCuentas;
     private javax.swing.JLabel txtOperaciones;

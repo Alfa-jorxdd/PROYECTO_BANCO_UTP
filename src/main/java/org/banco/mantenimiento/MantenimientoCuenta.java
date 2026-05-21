@@ -1,164 +1,82 @@
 package org.banco.mantenimiento;
 
-import org.banco.modelo.*;
-import org.banco.utils.Mantenimiento;
+import org.banco.modelos.*;
+import org.banco.modelos.interfaces.Mantenimiento;
 
 import java.util.Scanner;
+import org.banco.modelos.enums.EstadoCuenta;
+import org.banco.modelos.enums.Moneda;
 
-public class MantenimientoCuenta implements Mantenimiento{
-    
+public class MantenimientoCuenta implements Mantenimiento {
+
     private Scanner sc = new Scanner(System.in);
     private Banco banco;
+    private int[] idClientes;
+    private int idCuenta;
+    private int tipoCuenta;
+    private EstadoCuenta estadoCuenta;
+    private Moneda tipoMoneda;
 
-    public MantenimientoCuenta(Banco banco){
+    public MantenimientoCuenta(Banco banco) {
         this.banco = banco;
 
     }
 
-    public void MenuMantenimientoCuenta(){
-        int bandera;
-        int opcion;
-
-        do {
-            bandera = 0;
-            do {
-                System.out.println("-----------------------------");
-                System.out.println("*****GESTOR DE CUENTA******");
-                System.out.println("    1. Agregar cuenta");
-                System.out.println("    2. Eliminar cuenta");
-                System.out.println("    3. Actualizar cuenta");
-                System.out.println("    4. Imprimir cuenta");
-                System.out.println("    5. Salir");
-                System.out.print("-> ");
-                opcion = sc.nextInt();
-                if (opcion > 5 || opcion < 1){
-                    System.out.println("Por favor, ingrese una opción válida");
-                    continue;
-                }
-
-                bandera = 1;
-            } while(bandera == 0);
-            sc.nextLine();
-
-            switch (opcion){
-                case 1:
-                    agregar();
-                    break;
-
-                case 2:
-                    eliminar();
-                    break;
-
-                case 3:
-                    actualizar();
-                    break;
-
-                case 4:
-                    imprimir();
-                    break;
-
-                case 5:
-                    bandera = 2;
-                    break;
-            }
-
-        } while(bandera == 1);
-    }
-
     @Override
     public void agregar() {
-        int idCliente = 0;
-        int opcionCuenta = 0;
-        MantenimientoCliente listaClientes = new MantenimientoCliente(banco);
 
-        do {
-            System.out.println("---------------------------");
-            System.out.println("Por favor, elige el usuario");
-            listaClientes.imprimir();
-            System.out.print("->");
-            idCliente = sc.nextInt();
+        Cuenta nuevaCuenta = banco.guardarListaCuentas(tipoCuenta, tipoMoneda, estadoCuenta);
 
-            if (!banco.existeCliente(idCliente)){
-                System.out.println("Por favor, elija una opción válida");
-                continue;
+        if (idClientes.length > 1) {
+            for (int i = 0; i < idClientes.length; i++) {
+                Cliente nuevoCliente = banco.buscarIdCliente(idClientes[i]);
+                banco.guardarListaCliente_Cuenta(nuevoCliente, nuevaCuenta);
             }
-
-            break;
-        } while(true);
-        sc.nextLine();
-
-        Cliente nuevoCLiente = banco.buscarIdCliente(idCliente);
-
-        do {
-            System.out.println("--------------------------");
-            System.out.println("Eliga una cuenta a agregar");
-            System.out.println("    1. Cuenta Ahorro");
-            System.out.println("    2. Cuenta Corriente");
-            System.out.print("->");
-            opcionCuenta = sc.nextInt();
-
-            if (opcionCuenta > 2 || opcionCuenta < 1){
-                System.out.println("Por favor, elija una opción válida");
-                continue;
-            }
-
-            break;
-        } while (true);
-
-        Cuenta nuevaCuenta = banco.guardarListaCuentas(opcionCuenta);
-        banco.extenderListaCuentas();
-
-        banco.guardarListaCliente_Cuenta(nuevoCLiente, nuevaCuenta);
-        banco.extenderListaClienteCuenta();
-
-        System.out.println("-------------------------");
-        System.out.println("Cuenta añadida con éxito!");
+        } else {
+            Cliente nuevoCliente = banco.buscarIdCliente(idClientes[0]);
+            banco.guardarListaCliente_Cuenta(nuevoCliente, nuevaCuenta);
+        }
     }
 
     @Override
     public void eliminar() {
-
-        int idCuenta = 0;
-
-        do {
-            System.out.println("---------------------------");
-            System.out.println("Eliga una cuenta a eliminar");
-            imprimir();
-            System.out.print("->");
-            idCuenta = sc.nextInt();
-
-            if (!banco.existeCuenta(idCuenta)){
-                System.out.println("Por favor, elija una opción válida");
-                continue;
-            }
-            break;
-        } while (true);
-
-        banco.getCuentas()[banco.buscarIndiceCuenta(idCuenta)] = null;
-        banco.disminuirListaCuentas(idCuenta);
-
-        System.out.println("----------------------------");
-        System.out.println("Cliente eliminado con éxito!");
+        int indiceCuenta = banco.buscarIndiceCuenta(idCuenta);
+        banco.disminuirListaCuentas(indiceCuenta);
 
     }
 
     @Override
     public void actualizar() {
-
+        int indiceCuenta = banco.buscarIndiceCuenta(idCuenta);
+        
+        banco.getCuentas()[indiceCuenta].setEstadoCuenta(estadoCuenta);
+        banco.getCuentas()[indiceCuenta].setTipoMoneda(tipoMoneda);
+        
+        banco.disminuirListaCliente_CuentaPorIdCuenta(idCuenta);
+        
+        Cuenta cuenta = banco.buscarIdCuenta(idCuenta);
+        for (int i = 0; i < idClientes.length; i++) {
+            Cliente nuevoCliente = banco.buscarIdCliente(idClientes[i]);
+            banco.guardarListaCliente_Cuenta(nuevoCliente, cuenta);
+        }
     }
 
     @Override
     public void imprimir() {
-        StringBuilder sb = new StringBuilder("*****LISTA DE CUENTAS***** \n");
 
-        for (int i = 0; i < banco.getCuentas().length; i++) {
-            if (banco.getCuentas()[i] != null){
-                sb.append(banco.getCuentas()[i].getIdCuenta() + ". ");
-                sb.append(banco.getCuentas()[i].toString() + "\n");
-            }
-        }
-
-        System.out.println(sb);
     }
-    
+
+    public void setDatosCuenta(int tipoCuenta, EstadoCuenta estadoCuenta, Moneda tipoMoneda) {
+        this.tipoCuenta = tipoCuenta;
+        this.estadoCuenta = estadoCuenta;
+        this.tipoMoneda = tipoMoneda;
+    }
+
+    public void setIdClientes(int[] idClientes) {
+        this.idClientes = idClientes;
+    }
+
+    public void setIdCuenta(int idCuenta) {
+        this.idCuenta = idCuenta;
+    }
 }
