@@ -3,6 +3,7 @@ package org.banco.modelos;
 import java.util.Random;
 import org.banco.modelos.enums.EstadoCuenta;
 import org.banco.modelos.enums.Moneda;
+import org.banco.modelos.enums.TipoCuenta;
 
 public abstract class Cuenta {
     private static int incrementarId = 0;
@@ -11,20 +12,20 @@ public abstract class Cuenta {
     private long numeroCuenta;
     private EstadoCuenta estadoCuenta;
     private Moneda tipoMoneda;
+    private final TipoCuenta tipoCuenta;
 
-    public Cuenta(Moneda tipoMoneda, EstadoCuenta estadoCuenta) {
+    public Cuenta(Moneda tipoMoneda, EstadoCuenta estadoCuenta, TipoCuenta tipoCuenta) {
         crearDigitosCuenta();
-        
+
         this.idCuenta = ++incrementarId;
         this.tipoMoneda = tipoMoneda;
         this.estadoCuenta = estadoCuenta; 
-        
+        this.tipoCuenta = tipoCuenta;
+
         saldo = 0;
     }
 
-
-
-    private final void crearDigitosCuenta() {
+    private void crearDigitosCuenta() {
         Random digito = new Random();
         StringBuilder sb = new StringBuilder();
 
@@ -34,9 +35,15 @@ public abstract class Cuenta {
 
         numeroCuenta = Long.parseLong(sb.toString());
     }
-    
-    public abstract String getTipoCuenta();
-    
+
+    public Moneda getTipoMoneda() {
+        return tipoMoneda;
+    }
+
+    public TipoCuenta getTipoCuenta() {
+        return tipoCuenta;
+    }
+
     public void modificarEstado(EstadoCuenta estado){
         this.estadoCuenta = estadoCuenta;
     }
@@ -72,5 +79,4 @@ public abstract class Cuenta {
     public void setTipoMoneda(Moneda tipoMoneda) {
         this.tipoMoneda = tipoMoneda;
     }
-    
 }

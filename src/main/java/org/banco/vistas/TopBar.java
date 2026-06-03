@@ -54,7 +54,7 @@ public final class TopBar extends JPanel {
 
     }
 
-    public void enableDrag() {
+    private void enableDrag() {
         MouseAdapter mouseAdapter = new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -74,7 +74,7 @@ public final class TopBar extends JPanel {
         this.addMouseMotionListener(mouseMotionAdapter);
     }
     
-    public void btnExitFuncion(JLabel labelBntExit, Color colorDefault){
+    private void btnExitFuncion(JLabel labelBntExit, Color colorDefault){
         MouseAdapter mouseAdapter = new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {

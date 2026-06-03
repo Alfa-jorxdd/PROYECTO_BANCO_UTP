@@ -2,7 +2,6 @@ package org.banco.mantenimiento;
 
 import org.banco.modelos.*;
 
-import java.util.Scanner;
 import javax.swing.table.DefaultTableModel;
 import org.banco.modelos.enums.EstadoCuenta;
 import org.banco.modelos.enums.Moneda;
@@ -11,7 +10,6 @@ import org.banco.modelos.interfaces.Gestionable;
 
 public class MantenimientoCuenta implements Gestionable {
 
-    private Scanner sc = new Scanner(System.in);
     private Banco banco;
     private int[] idClientes;
     private int idCuenta;
@@ -21,22 +19,21 @@ public class MantenimientoCuenta implements Gestionable {
 
     public MantenimientoCuenta(Banco banco) {
         this.banco = banco;
-
     }
 
     @Override
     public void agregar() {
 
-        Cuenta nuevaCuenta = banco.guardarListaCuentas(tipoCuenta, tipoMoneda, estadoCuenta);
+        Cuenta nuevaCuenta = banco.agregarListaCuentas(tipoCuenta, tipoMoneda, estadoCuenta);
 
         if (idClientes.length > 1) {
             for (int i = 0; i < idClientes.length; i++) {
                 Cliente nuevoCliente = banco.buscarIdCliente(idClientes[i]);
-                banco.guardarListaCliente_Cuenta(nuevoCliente, nuevaCuenta);
+                banco.agregarListaCliente_Cuenta(nuevoCliente, nuevaCuenta);
             }
         } else {
             Cliente nuevoCliente = banco.buscarIdCliente(idClientes[0]);
-            banco.guardarListaCliente_Cuenta(nuevoCliente, nuevaCuenta);
+            banco.agregarListaCliente_Cuenta(nuevoCliente, nuevaCuenta);
         }
     }
 
@@ -57,10 +54,10 @@ public class MantenimientoCuenta implements Gestionable {
         
         banco.disminuirListaCliente_CuentaPorIdCuenta(idCuenta);
         
-        Cuenta cuenta = banco.buscarIdCuenta(idCuenta);
+        Cuenta cuenta = banco.buscarCuentaPorId(idCuenta);
         for (int i = 0; i < idClientes.length; i++) {
             Cliente nuevoCliente = banco.buscarIdCliente(idClientes[i]);
-            banco.guardarListaCliente_Cuenta(nuevoCliente, cuenta);
+            banco.agregarListaCliente_Cuenta(nuevoCliente, cuenta);
         }
     }
 

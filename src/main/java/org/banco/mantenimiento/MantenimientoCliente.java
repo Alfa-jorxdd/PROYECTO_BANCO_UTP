@@ -4,14 +4,12 @@ import org.banco.modelos.*;
 
 import org.banco.modelos.Banco;
 
-import java.util.Scanner;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import org.banco.modelos.interfaces.Gestionable;
 
 public class MantenimientoCliente implements Gestionable {
 
-    private Scanner sc = new Scanner(System.in);
     private Banco banco;
     private int idCliente;
     private String nombres;
@@ -26,7 +24,7 @@ public class MantenimientoCliente implements Gestionable {
 
     @Override
     public void agregar() {
-        banco.guardarListaClientes(nombres, apellidos, DNI, telefono, correo);
+        banco.agregarListaClientes(nombres, apellidos, DNI, telefono, correo);
     }
 
     @Override

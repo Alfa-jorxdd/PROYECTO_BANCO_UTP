@@ -6,16 +6,13 @@ import org.banco.modelos.enums.TipoCuenta;
 
 public class Cuenta_Corriente extends Cuenta{
 
-    private TipoCuenta tipoCuenta;
+    private final double limiteSobregiro = 500;
 
     public Cuenta_Corriente(Moneda tipoMoneda, EstadoCuenta estadoCuenta) {
-        super(tipoMoneda, estadoCuenta);
-        this.tipoCuenta = TipoCuenta.CORRIENTE;
+        super(tipoMoneda, estadoCuenta, TipoCuenta.CORRIENTE);
     }
 
-    @Override
-    public String getTipoCuenta() {
-        return tipoCuenta.toString();
+    public double getLimiteSobregiro() {
+        return limiteSobregiro;
     }
-    
 }

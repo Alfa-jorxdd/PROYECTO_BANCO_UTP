@@ -127,7 +127,7 @@ public class Banco {
 
                     String[] partesCadena = cadena.split(";");
 
-                    Cliente nuevoCliente = guardarListaClientes(
+                    Cliente nuevoCliente = agregarListaClientes(
                             partesCadena[0], 
                             partesCadena[1],
                             Integer.parseInt(partesCadena[2]), 
@@ -135,14 +135,14 @@ public class Banco {
                             partesCadena[4]
                     );
 
-                    Cuenta nuevaCuenta = guardarListaCuentas(
+                    Cuenta nuevaCuenta = agregarListaCuentas(
                             TipoCuenta.valueOf(partesCadena[5]),
                             Moneda.valueOf(partesCadena[6]), 
                             EstadoCuenta.valueOf(partesCadena[7])
                     );
                     
 
-                    guardarListaCliente_Cuenta(nuevoCliente,
+                    agregarListaCliente_Cuenta(nuevoCliente,
                             nuevaCuenta);
                 }
 
@@ -154,7 +154,7 @@ public class Banco {
         }
     }
 
-    public Cliente guardarListaClientes(String nombreCliente, String apellidoCliente, int dniCliente, int telefonoCLiente, String correoCliente) {
+    public Cliente agregarListaClientes(String nombreCliente, String apellidoCliente, int dniCliente, int telefonoCLiente, String correoCliente) {
         Cliente nuevoCliente = new Cliente(nombreCliente, apellidoCliente, dniCliente, telefonoCLiente, correoCliente);
         clientes[clientes.length - 1] = nuevoCliente;
         
@@ -162,7 +162,7 @@ public class Banco {
         return nuevoCliente;
     }
 
-    public Cuenta guardarListaCuentas(TipoCuenta tipoCuenta, Moneda tipoMoneda, EstadoCuenta estadoCuenta) {
+    public Cuenta agregarListaCuentas(TipoCuenta tipoCuenta, Moneda tipoMoneda, EstadoCuenta estadoCuenta) {
         Cuenta nuevaCuenta = null;
 
         switch (tipoCuenta) {
@@ -183,7 +183,7 @@ public class Banco {
         return nuevaCuenta;
     }
 
-    public void guardarListaCliente_Cuenta(Cliente nuevoCliente, Cuenta nuevaCuenta) {
+    public void agregarListaCliente_Cuenta(Cliente nuevoCliente, Cuenta nuevaCuenta) {
         Cliente_Cuenta relacionClienteCuenta = new Cliente_Cuenta(nuevoCliente.getIdCliente(), nuevaCuenta.getIdCuenta());
         cliente_cuenta[cliente_cuenta.length - 1] = relacionClienteCuenta;
         
@@ -217,7 +217,7 @@ public class Banco {
         return -1;
     }
 
-    public boolean existeCuenta(int idCuenta) {
+    public boolean existeCuenta(int idCuenta) { //ESTE MÉTODO SE ELIMINARÁ, RECUERDA ESTO ANGHELOOO
         for (Cuenta cuenta : cuentas) {
             if (cuenta != null && cuenta.getIdCuenta() == idCuenta) {
                 return true;
@@ -226,7 +226,7 @@ public class Banco {
         return false;
     }
 
-    public Cuenta buscarIdCuenta(int idCuenta) { //BUSCA EL CLIENTE POR EL ID
+    public Cuenta buscarCuentaPorId(int idCuenta) { //BUSCA EL CLIENTE POR EL ID
         for (Cuenta cuenta : cuentas) {
             if (cuenta != null && cuenta.getIdCuenta() == idCuenta) {
                 return cuenta;
@@ -257,7 +257,7 @@ public class Banco {
         int i = 0;
         for (Cliente_Cuenta cc : cliente_cuenta) {
             if (cc != null && cc.getIdCliente() == idCliente) {
-                cuentas[i++] = buscarIdCuenta(cc.getIdCuenta());
+                cuentas[i++] = buscarCuentaPorId(cc.getIdCuenta());
             }
         }
         return cuentas;

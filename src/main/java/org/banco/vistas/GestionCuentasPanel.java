@@ -16,11 +16,11 @@ import org.banco.modelos.enums.TipoCuenta;
 
 public class GestionCuentasPanel extends javax.swing.JPanel {
 
-    private Banco banco;
-    private MantenimientoCuenta mc;
-    private DefaultListModel<String> modeloResultados = new DefaultListModel<>();
-    private DefaultListModel<String> modeloLista = new DefaultListModel<>();
-    private DefaultListModel<String> modeloTitulares = new DefaultListModel<>();
+    private final Banco banco;
+    private final MantenimientoCuenta mc;
+    private final DefaultListModel<String> modeloResultados = new DefaultListModel<>();
+    private final DefaultListModel<String> modeloLista = new DefaultListModel<>();
+    private final DefaultListModel<String> modeloTitulares = new DefaultListModel<>();
     private final DefaultTableModel dtm;
     private final Object[] obj = new Object[7];
 

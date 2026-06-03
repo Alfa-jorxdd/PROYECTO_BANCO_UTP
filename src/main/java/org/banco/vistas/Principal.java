@@ -13,16 +13,16 @@ public final class Principal extends javax.swing.JPanel {
     public Principal(Banco banco) {
         initComponents();
         dtm = (DefaultTableModel) tClientesRecientes.getModel();
-        InitStyles();
+        initStyles();
 
         this.banco = banco;
 
-        ponerUltimosClientes();
-        cargarDatosDashboard();
+        ponerUltimosClientesTabla();
+        cargarDatos();
 
     }
 
-    public void InitStyles() {
+    private void initStyles() {
         txtTitulo.putClientProperty("FlatLaf.styleClass", "h0");
         txtClientes.putClientProperty("FlatLaf.styleClass", "h3");
         txtCuentas.putClientProperty("FlatLaf.styleClass", "h3");
@@ -32,14 +32,14 @@ public final class Principal extends javax.swing.JPanel {
 
     }
 
-    public void cargarDatosDashboard() {
+    private void cargarDatos() {
         numClientes.setText(String.valueOf(banco.getClientes().length - 1));
         numCuentas.setText(String.valueOf(banco.getCuentas().length - 1));
         numOperaciones.setText("0");
         numSaldo.setText("S/" + "0");
     }
 
-    public void ponerUltimosClientes() {
+    private void ponerUltimosClientesTabla() {
 
         dtm.setRowCount(0);
 

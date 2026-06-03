@@ -6,17 +6,13 @@ import org.banco.modelos.enums.TipoCuenta;
 
 public class Cuenta_Ahorro extends Cuenta{
 
-    private TipoCuenta tipoCuenta;
-    private int cantidadOperaciones;
+    private final int LimiteRetirosDiarios = 5;
 
     public Cuenta_Ahorro(Moneda tipoMoneda, EstadoCuenta estadoCuenta) {
-        super(tipoMoneda, estadoCuenta);
-        this.tipoCuenta = TipoCuenta.AHORRO;
+        super(tipoMoneda, estadoCuenta, TipoCuenta.AHORRO);
     }
 
-    @Override
-    public String getTipoCuenta() {
-        return tipoCuenta.toString();
+    public int getLimiteRetirosDiarios() {
+        return LimiteRetirosDiarios;
     }
-      
 }
