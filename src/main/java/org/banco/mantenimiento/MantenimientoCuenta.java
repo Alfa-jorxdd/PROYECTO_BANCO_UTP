@@ -1,19 +1,21 @@
 package org.banco.mantenimiento;
 
 import org.banco.modelos.*;
-import org.banco.modelos.interfaces.Mantenimiento;
 
 import java.util.Scanner;
+import javax.swing.table.DefaultTableModel;
 import org.banco.modelos.enums.EstadoCuenta;
 import org.banco.modelos.enums.Moneda;
+import org.banco.modelos.enums.TipoCuenta;
+import org.banco.modelos.interfaces.Gestionable;
 
-public class MantenimientoCuenta implements Mantenimiento {
+public class MantenimientoCuenta implements Gestionable {
 
     private Scanner sc = new Scanner(System.in);
     private Banco banco;
     private int[] idClientes;
     private int idCuenta;
-    private int tipoCuenta;
+    private TipoCuenta tipoCuenta;
     private EstadoCuenta estadoCuenta;
     private Moneda tipoMoneda;
 
@@ -40,6 +42,7 @@ public class MantenimientoCuenta implements Mantenimiento {
 
     @Override
     public void eliminar() {
+        banco.disminuirListaCliente_CuentaPorIdCuenta(idCuenta);
         int indiceCuenta = banco.buscarIndiceCuenta(idCuenta);
         banco.disminuirListaCuentas(indiceCuenta);
 
@@ -62,11 +65,38 @@ public class MantenimientoCuenta implements Mantenimiento {
     }
 
     @Override
-    public void imprimir() {
+    public void listar(DefaultTableModel dtm, Object[] obj) {
+        dtm.setRowCount(0);
 
+        for (int i = 0; i < banco.getCuentas().length - 1; i++) {
+
+            int idCuenta = banco.getCuentas()[i].getIdCuenta();
+            obj[0] = idCuenta;
+            obj[1] = banco.getCuentas()[i].getTipoCuenta();
+            obj[2] = banco.getCuentas()[i].getEstadoCuenta();
+            obj[3] = banco.getCuentas()[i].getNumeroCuenta();
+
+            Cliente[] clientes = banco.buscarClientesPorIdCuenta(idCuenta);
+
+            if (clientes.length > 1) {
+                for (int j = 0; j < clientes.length; j++) {
+                    obj[4] = clientes[j].getNombres() + " " + clientes[j].getApellidos();
+                    obj[5] = banco.getCuentas()[i].getSaldo();
+                    obj[6] = banco.getCuentas()[i].getMoneda();
+
+                    dtm.addRow(obj);
+                }
+            } else {
+                obj[4] = clientes[0].getNombres() + " " + clientes[0].getApellidos();
+                obj[5] = banco.getCuentas()[i].getSaldo();
+                obj[6] = banco.getCuentas()[i].getMoneda();
+
+                dtm.addRow(obj);
+            }
+        }
     }
 
-    public void setDatosCuenta(int tipoCuenta, EstadoCuenta estadoCuenta, Moneda tipoMoneda) {
+    public void setDatosCuenta(TipoCuenta tipoCuenta, EstadoCuenta estadoCuenta, Moneda tipoMoneda) {
         this.tipoCuenta = tipoCuenta;
         this.estadoCuenta = estadoCuenta;
         this.tipoMoneda = tipoMoneda;

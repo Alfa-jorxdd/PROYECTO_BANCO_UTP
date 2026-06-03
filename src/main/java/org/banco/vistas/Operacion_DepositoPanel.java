@@ -1,0 +1,363 @@
+package org.banco.vistas;
+
+import javax.swing.DefaultListModel;
+import javax.swing.JOptionPane;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import org.banco.mantenimiento.MantenimientoOperacion;
+import org.banco.modelos.Banco;
+import org.banco.modelos.Cliente;
+import org.banco.modelos.Cuenta;
+
+public class Operacion_DepositoPanel extends javax.swing.JPanel {
+
+    private Banco banco;
+    private DefaultListModel<String> modeloListaCuenta = new DefaultListModel<>();
+    private DefaultListModel<String> modeloResultadosCuenta = new DefaultListModel<>();
+    private DefaultListModel<String> modeloListaDNI = new DefaultListModel<>();
+    private DefaultListModel<String> modeloResultadosDNI = new DefaultListModel<>();
+
+    public Operacion_DepositoPanel(Banco banco) {
+        initComponents();
+        InitStyles();
+
+        this.banco = banco;
+
+        listNumeroCuenta.setModel(modeloResultadosCuenta);
+        listDNI.setModel(modeloResultadosDNI);
+
+        cargarModeloListaCuenta();
+        cargarModeloListaDNI();
+
+        txtNumeroCuenta.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                filtrarModelCuenta();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                filtrarModelCuenta();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+
+            }
+        });
+
+        txtDNI.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                filtrarModelDNI();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                filtrarModelDNI();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+
+            }
+        });
+        
+    }
+
+    private void filtrarModelCuenta() {
+        String numeroBuscado = txtNumeroCuenta.getText().trim();
+        modeloResultadosCuenta.clear();
+
+        if (numeroBuscado.isEmpty() || !numeroBuscado.matches("[0-9]+")) {
+            return;
+        }
+
+        for (int i = 0; i < banco.getCuentas().length - 1; i++) {
+            String cuentaTxt = String.valueOf(banco.getCuentas()[i].getNumeroCuenta());
+            
+            if (cuentaTxt.contains(numeroBuscado)) {
+                Cliente[] titulares = banco.buscarClientesPorIdCuenta(banco.getCuentas()[i].getIdCuenta());
+                for (int j = 0; j < titulares.length; j++) {
+                    String primerNombre = titulares[j].getNombres().split(" ")[0];
+                    String primerApellido = titulares[j].getApellidos().split(" ")[0];
+                    modeloResultadosCuenta.addElement(primerNombre + " " + primerApellido + " - " + banco.getCuentas()[i].getNumeroCuenta());
+                }
+            }
+        }
+    }
+    
+    private void filtrarModelDNI() {
+        String dniBuscado = txtDNI.getText().trim();
+        modeloResultadosDNI.clear();
+
+        if (dniBuscado.isEmpty() || !dniBuscado.matches("[0-9]+")) {
+            return;
+        }
+
+        for (int i = 0; i < banco.getClientes().length - 1; i++) {
+            String dniTxt = String.valueOf(banco.getClientes()[i].getDni());
+            String primerNombre = banco.getClientes()[i].getNombres().split(" ")[0];
+            String primerApellido = banco.getClientes()[i].getApellidos().split(" ")[0];
+            
+            if (dniTxt.contains(dniBuscado)) {
+                modeloResultadosDNI.addElement(primerNombre + " " + primerApellido + " - " + dniTxt);
+            }
+        }
+    }
+
+    private void cargarModeloListaCuenta() {
+        modeloListaCuenta.removeAllElements();
+        for (int i = 0; i < banco.getClientes().length - 1; i++) {
+            Cliente c = banco.getClientes()[i];
+            modeloListaCuenta.addElement(c.getNombres() + " " + c.getApellidos());
+        }
+    }
+
+    private void cargarModeloListaDNI() {
+        modeloListaDNI.removeAllElements();
+        for (int i = 0; i < banco.getClientes().length - 1; i++) {
+            Cliente c = banco.getClientes()[i];
+            modeloListaDNI.addElement(c.getNombres() + " " + c.getApellidos());
+        }
+    }
+
+    private void InitStyles() {
+        labelDeposito.putClientProperty("FlatLaf.styleClass", "h0");
+    }
+
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        bg = new javax.swing.JPanel();
+        panelTitulos = new javax.swing.JPanel();
+        labelDeposito = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        btnDepositar = new javax.swing.JButton();
+        jPanel3 = new javax.swing.JPanel();
+        txtNumeroCuenta = new javax.swing.JTextField();
+        labelNumeroCuenta = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        listNumeroCuenta = new javax.swing.JList<>();
+        txtMonto = new javax.swing.JTextField();
+        labelMonto = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
+        labelDNI = new javax.swing.JLabel();
+        txtDNI = new javax.swing.JTextField();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        listDNI = new javax.swing.JList<>();
+        boxTipoMoneda = new javax.swing.JComboBox<>();
+        labelMoneda = new javax.swing.JLabel();
+
+        setMinimumSize(new java.awt.Dimension(518, 396));
+        setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        bg.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        labelDeposito.setText("Depósito");
+
+        jLabel4.setText("Agrega fondos a una cuenta Bancaria");
+
+        javax.swing.GroupLayout panelTitulosLayout = new javax.swing.GroupLayout(panelTitulos);
+        panelTitulos.setLayout(panelTitulosLayout);
+        panelTitulosLayout.setHorizontalGroup(
+            panelTitulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelTitulosLayout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addGroup(panelTitulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(labelDeposito, javax.swing.GroupLayout.PREFERRED_SIZE, 478, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 245, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(10, Short.MAX_VALUE))
+        );
+        panelTitulosLayout.setVerticalGroup(
+            panelTitulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelTitulosLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(labelDeposito, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel4)
+                .addContainerGap(15, Short.MAX_VALUE))
+        );
+
+        bg.add(panelTitulos, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+
+        btnDepositar.setText("Confirmar depósito");
+        btnDepositar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnDepositarActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(22, 22, 22)
+                .addComponent(btnDepositar, javax.swing.GroupLayout.PREFERRED_SIZE, 470, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(26, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addComponent(btnDepositar, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(17, Short.MAX_VALUE))
+        );
+
+        bg.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 318, 518, 80));
+
+        jPanel3.setAlignmentX(0.01F);
+        jPanel3.setAlignmentY(0.01F);
+        jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        jPanel3.add(txtNumeroCuenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 220, 30));
+
+        labelNumeroCuenta.setText("Número de cuenta:");
+        jPanel3.add(labelNumeroCuenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 194, 24));
+
+        listNumeroCuenta.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                listNumeroCuentaValueChanged(evt);
+            }
+        });
+        jScrollPane1.setViewportView(listNumeroCuenta);
+
+        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, 220, 37));
+        jPanel3.add(txtMonto, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 172, 220, 30));
+
+        labelMonto.setText("Monto");
+        jPanel3.add(labelMonto, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 150, 70, -1));
+
+        bg.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 253, 230));
+
+        labelDNI.setText("DNI:");
+
+        listDNI.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
+                listDNIValueChanged(evt);
+            }
+        });
+        jScrollPane2.setViewportView(listDNI);
+
+        boxTipoMoneda.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "NINGUNA", "SOL", "DOLAR" }));
+
+        labelMoneda.setText("Moneda:");
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(19, 19, 19)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(txtDNI, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
+                        .addComponent(labelDNI)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                    .addComponent(labelMoneda, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(boxTipoMoneda, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(24, Short.MAX_VALUE))
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addGap(28, 28, 28)
+                .addComponent(labelDNI)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(txtDNI, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
+                .addComponent(labelMoneda)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(boxTipoMoneda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(37, 37, 37))
+        );
+
+        bg.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(259, 90, 250, 230));
+
+        add(bg, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 518, 398));
+
+        getAccessibleContext().setAccessibleName("");
+    }// </editor-fold>//GEN-END:initComponents
+
+    
+    //======================EVENTOS==========================
+    
+    private void listNumeroCuentaValueChanged(javax.swing.event.ListSelectionEvent evt) {                                              
+        if (!evt.getValueIsAdjusting()) {
+            String seleccionLista = listNumeroCuenta.getSelectedValue();
+            if (seleccionLista != null) {
+                String cuentaSeleccionada = seleccionLista.split(" - ")[1];
+                txtNumeroCuenta.setText(cuentaSeleccionada);
+            }
+        }
+    }
+
+    private void listDNIValueChanged(javax.swing.event.ListSelectionEvent evt) {                                     
+        if (!evt.getValueIsAdjusting()) {
+            String seleccionLista = listDNI.getSelectedValue();
+            if (seleccionLista != null) {
+                String dniSeleccionado = seleccionLista.split(" - ")[1];
+                txtDNI.setText(dniSeleccionado);
+            }
+        }
+    }
+
+    private void btnDepositarActionPerformed(java.awt.event.ActionEvent evt) {                                             
+        if (txtNumeroCuenta.getText().trim().isEmpty() 
+                || txtDNI.getText().trim().isEmpty() 
+                || txtMonto.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Todos los campos deben estar llenos", "Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        if (!txtNumeroCuenta.getText().matches("^[0-9]{10}$") 
+                || !txtDNI.getText().matches("^[0-9]{8}$")) {
+            JOptionPane.showMessageDialog(null, "Números de cuenta o DNI inválidos", "Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        if (!txtMonto.getText().trim().matches("^[0-9]+([.][0-9]{1,2})?$") 
+                || Double.parseDouble(txtMonto.getText().trim()) <= 0) {
+            JOptionPane.showMessageDialog(null, "Monto inválido. Solo debe contener números positivos y máximo 2 dígitos decimales", "Error", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        MantenimientoOperacion mo = new MantenimientoOperacion(banco);
+        
+        long numeroCuenta = Long.parseLong(txtNumeroCuenta.getText().trim());
+        double monto = Double.parseDouble(txtMonto.getText().trim());
+        int DNI = Integer.parseInt(txtDNI.getText().trim());
+        
+        mo.depositar(numeroCuenta, monto);
+        
+        txtNumeroCuenta.setText("");
+        txtDNI.setText("");
+        txtMonto.setText("");
+    }
+
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel bg;
+    private javax.swing.JComboBox<String> boxTipoMoneda;
+    private javax.swing.JButton btnDepositar;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JLabel labelDNI;
+    private javax.swing.JLabel labelDeposito;
+    private javax.swing.JLabel labelMoneda;
+    private javax.swing.JLabel labelMonto;
+    private javax.swing.JLabel labelNumeroCuenta;
+    private javax.swing.JList<String> listDNI;
+    private javax.swing.JList<String> listNumeroCuenta;
+    private javax.swing.JPanel panelTitulos;
+    private javax.swing.JTextField txtDNI;
+    private javax.swing.JTextField txtMonto;
+    private javax.swing.JTextField txtNumeroCuenta;
+    // End of variables declaration//GEN-END:variables
+}

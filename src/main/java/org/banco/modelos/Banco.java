@@ -6,12 +6,14 @@ import java.io.IOException;
 import java.util.Scanner;
 import org.banco.modelos.enums.EstadoCuenta;
 import org.banco.modelos.enums.Moneda;
+import org.banco.modelos.enums.TipoCuenta;
 
 public class Banco {
 
     private Cliente[] clientes;
     private Cuenta[] cuentas;
     private Cliente_Cuenta[] cliente_cuenta;
+    private RegistroOperacion[] operaciones;
 
     private final Scanner sc = new Scanner(System.in);
 
@@ -19,6 +21,7 @@ public class Banco {
         clientes = new Cliente[1];
         cuentas = new Cuenta[1];
         cliente_cuenta = new Cliente_Cuenta[1];
+        operaciones = new RegistroOperacion[1];
     }
 
     public void extenderListaClientes() {
@@ -132,8 +135,8 @@ public class Banco {
                             partesCadena[4]
                     );
 
-                    Cuenta nuevaCuenta = guardarListaCuentas(Integer.parseInt(
-                            partesCadena[5]), 
+                    Cuenta nuevaCuenta = guardarListaCuentas(
+                            TipoCuenta.valueOf(partesCadena[5]),
                             Moneda.valueOf(partesCadena[6]), 
                             EstadoCuenta.valueOf(partesCadena[7])
                     );
@@ -159,17 +162,17 @@ public class Banco {
         return nuevoCliente;
     }
 
-    public Cuenta guardarListaCuentas(int opcionCuenta, Moneda tipoMoneda, EstadoCuenta estadoCuenta) {
+    public Cuenta guardarListaCuentas(TipoCuenta tipoCuenta, Moneda tipoMoneda, EstadoCuenta estadoCuenta) {
         Cuenta nuevaCuenta = null;
 
-        switch (opcionCuenta) {
-            case 1:
+        switch (tipoCuenta) {
+            case AHORRO:
                 nuevaCuenta = new Cuenta_Ahorro(tipoMoneda, estadoCuenta);
                 break;
-            case 2:
+            case CORRIENTE:
                 nuevaCuenta = new Cuenta_Corriente(tipoMoneda, estadoCuenta);
                 break;
-            case 3:
+            case MANCOMUNADA:
                 nuevaCuenta = new Cuenta_Mancomunada(tipoMoneda, estadoCuenta);
                 break;
         }
@@ -277,6 +280,28 @@ public class Banco {
             }
         }
         return clientes;
+    }
+    
+    public int buscarIdClientePorNombre(String nombreCliente) {
+        for (int i = 0; i < clientes.length - 1; i++) {
+            Cliente c = clientes[i];
+            String nombreCompleto = c.getNombres() + " " + c.getApellidos();
+            if (nombreCompleto.equals(nombreCliente)) {
+                return c.getIdCliente();
+            }
+        }
+        return -1;
+    }
+    
+    public Cuenta buscarCuentaPorNumeroCuenta(long numeroCuenta){
+        for (int i = 0; i < cuentas.length - 1; i++) {
+            Cuenta c = cuentas[i];
+            long posibleCuenta = c.getNumeroCuenta();
+            if (posibleCuenta == numeroCuenta) {
+                return c;
+            }
+        }
+        return null;
     }
 
     public Cuenta[] getCuentas() {

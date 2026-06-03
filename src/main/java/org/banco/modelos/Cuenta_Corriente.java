@@ -2,21 +2,20 @@ package org.banco.modelos;
 
 import org.banco.modelos.enums.EstadoCuenta;
 import org.banco.modelos.enums.Moneda;
+import org.banco.modelos.enums.TipoCuenta;
 
 public class Cuenta_Corriente extends Cuenta{
 
+    private TipoCuenta tipoCuenta;
+
     public Cuenta_Corriente(Moneda tipoMoneda, EstadoCuenta estadoCuenta) {
         super(tipoMoneda, estadoCuenta);
-    }
-    
-    @Override
-    public String toString() {
-        return getTipoCuenta() + "| N° " + getNumeroCuenta();
+        this.tipoCuenta = TipoCuenta.CORRIENTE;
     }
 
     @Override
     public String getTipoCuenta() {
-        return "Cuenta corriente";
+        return tipoCuenta.toString();
     }
     
 }

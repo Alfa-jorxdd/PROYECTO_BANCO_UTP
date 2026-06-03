@@ -12,6 +12,7 @@ import org.banco.modelos.Banco;
 import org.banco.modelos.Cliente;
 import org.banco.modelos.enums.EstadoCuenta;
 import org.banco.modelos.enums.Moneda;
+import org.banco.modelos.enums.TipoCuenta;
 
 public class GestionCuentasPanel extends javax.swing.JPanel {
 
@@ -27,6 +28,7 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
 
     public GestionCuentasPanel(Banco banco) {
         initComponents();
+        initStyles();
 
         dtm = (DefaultTableModel) tCuentas.getModel();
 
@@ -72,7 +74,11 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
             }
         });
 
-        cargarCuentasTabla();
+        listarCuentasTabla();
+    }
+    
+    private void initStyles() {
+        tCuentas.setShowVerticalLines(true);
     }
     //Llena modeloLista con todos los nombres y apellidos de cada cliente
     private void cargarModeloLista() {
@@ -125,36 +131,9 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
         btnEliminar.setEnabled(operador);
         btnReporte.setEnabled(operador);
     }
-    //Llena toda la tabla de cuentas 
-    private void cargarCuentasTabla() {
-        dtm.setRowCount(0);
-
-        for (int i = 0; i < banco.getCuentas().length - 1; i++) {
-
-            int idCuenta = banco.getCuentas()[i].getIdCuenta();
-            obj[0] = idCuenta;
-            obj[1] = banco.getCuentas()[i].getTipoCuenta();
-            obj[2] = banco.getCuentas()[i].getEstadoCuenta();
-            obj[3] = banco.getCuentas()[i].getNumeroCuenta();
-
-            Cliente[] clientes = banco.buscarClientesPorIdCuenta(idCuenta);
-
-            if (clientes.length > 1) {
-                for (int j = 0; j < clientes.length; j++) {
-                    obj[4] = clientes[j].getNombres() + " " + clientes[j].getApellidos();
-                    obj[5] = banco.getCuentas()[i].getSaldo();
-                    obj[6] = banco.getCuentas()[i].getMoneda();
-
-                    dtm.addRow(obj);
-                }
-            } else {
-                obj[4] = clientes[0].getNombres() + " " + clientes[0].getApellidos();
-                obj[5] = banco.getCuentas()[i].getSaldo();
-                obj[6] = banco.getCuentas()[i].getMoneda();
-
-                dtm.addRow(obj);
-            }
-        }
+    //Llena toda la tabla de cuentas llamando al metodo listar de la clase Mantenimiento Cuenta
+    private void listarCuentasTabla() {
+        mc.listar(dtm, obj);
     }
     //Limpia todos los campos del formulario
     private void limpiarFormulario() {
@@ -163,32 +142,22 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
         boxEstado.setSelectedIndex(0);
         boxMoneda.setSelectedIndex(0);
     }
-    //Devuelve el id del cliente según sus nombres y apellidos
-    private int obtenerIdCliente(String nombreCliente) {
-        for (int i = 0; i < banco.getClientes().length - 1; i++) {
-            Cliente c = banco.getClientes()[i];
-            String nombreCompleto = c.getNombres() + " " + c.getApellidos();
-            if (nombreCompleto.equals(nombreCliente)) {
-                return c.getIdCliente();
-            }
-        }
-        return -1;
-    }
+    
     //Agrega o actualiza la lista de cuenta y cliente_cuenta según los campos en el formulario
     private void AgregarOActualizar() {
         EstadoCuenta estado = EstadoCuenta.values()[boxEstado.getSelectedIndex() - 1];
         Moneda moneda = Moneda.values()[boxMoneda.getSelectedIndex() - 1];
 
-        mc.setDatosCuenta(boxTpoCuenta.getSelectedIndex(), estado, moneda);
+        mc.setDatosCuenta(TipoCuenta.values()[boxTpoCuenta.getSelectedIndex() - 1], estado, moneda);
         if (modeloTitulares.getSize() > 1) {
             int[] idClientes = new int[modeloTitulares.getSize()];
             for (int i = 0; i < idClientes.length; i++) {
-                idClientes[i] = obtenerIdCliente(modeloTitulares.getElementAt(i));
+                idClientes[i] = banco.buscarIdClientePorNombre(modeloTitulares.getElementAt(i));
             }
             mc.setIdClientes(idClientes);
         } else {
             int[] idCliente = new int[1];
-            idCliente[0] = obtenerIdCliente(modeloTitulares.firstElement());
+            idCliente[0] = banco.buscarIdClientePorNombre(modeloTitulares.firstElement());
             mc.setIdClientes(idCliente);
         }
     }
@@ -249,12 +218,12 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
         jScrollPane1.setViewportView(tCuentas);
         if (tCuentas.getColumnModel().getColumnCount() > 0) {
             tCuentas.getColumnModel().getColumn(0).setResizable(false);
-            tCuentas.getColumnModel().getColumn(0).setPreferredWidth(10);
+            tCuentas.getColumnModel().getColumn(0).setPreferredWidth(2);
             tCuentas.getColumnModel().getColumn(1).setResizable(false);
             tCuentas.getColumnModel().getColumn(1).setPreferredWidth(50);
             tCuentas.getColumnModel().getColumn(2).setPreferredWidth(30);
             tCuentas.getColumnModel().getColumn(3).setResizable(false);
-            tCuentas.getColumnModel().getColumn(4).setPreferredWidth(150);
+            tCuentas.getColumnModel().getColumn(4).setPreferredWidth(120);
             tCuentas.getColumnModel().getColumn(5).setResizable(false);
             tCuentas.getColumnModel().getColumn(6).setResizable(false);
             tCuentas.getColumnModel().getColumn(6).setPreferredWidth(20);
@@ -361,7 +330,7 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
             mc.setIdCuenta(idCuenta);
             mc.eliminar();
             
-            cargarCuentasTabla();
+            listarCuentasTabla();
             JOptionPane.showMessageDialog(null, "Cuenta elimiinada con éxito");
             
         } else {
@@ -378,7 +347,7 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
 
             limpiarFormulario();
 
-            cargarCuentasTabla();
+            listarCuentasTabla();
             JOptionPane.showMessageDialog(null, "Cuenta agregada exitosamente");
         } else {
             JOptionPane.showMessageDialog(null, "Por favor, llena todos los campos", "Error al agregar cuenta", JOptionPane.WARNING_MESSAGE);
@@ -461,7 +430,7 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
             
             habilitarActualizar = false;
             habilitarBotones(true);
-            cargarCuentasTabla();
+            listarCuentasTabla();
             
             JOptionPane.showMessageDialog(null, "Cuenta actualziada exitosamente");
 

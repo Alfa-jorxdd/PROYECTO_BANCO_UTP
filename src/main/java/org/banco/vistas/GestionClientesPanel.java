@@ -7,26 +7,30 @@ import org.banco.mantenimiento.MantenimientoCliente;
 import org.banco.modelos.Banco;
 
 public final class GestionClientesPanel extends javax.swing.JPanel {
-    
+
     private final DefaultTableModel dtm;
     private final Object[] obj = new Object[6];
     private final Banco banco;
     private final MantenimientoCliente mc;
     private boolean habilitarActualiar = false;
-    
+
     public GestionClientesPanel(Banco banco) {
         initComponents();
         dtm = (DefaultTableModel) tClientes.getModel();
         this.banco = banco;
-        
+
         mc = new MantenimientoCliente(this.banco);
-        
-        cargarClientesTabla();
+
+        listarClientesTabla();
         initStyles();
     }
-    
-    private void initStyles(){
+    //Inicializa todos los estilos Flatlaf
+    private void initStyles() {
         tClientes.setShowVerticalLines(true);
+    }
+    //Llena toda la tabla de cuentas llamando al metodo listar de la clase Mantenimiento Cliente
+    private void listarClientesTabla() {
+        mc.listar(dtm, obj);
     }
 
     @SuppressWarnings("unchecked")
@@ -151,42 +155,58 @@ public final class GestionClientesPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    //==============================EVENTOS===============================
     private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
-        
-        if(     !txtNombre.getText().trim().isEmpty() &&
-                !txtApellidos.getText().trim().isEmpty() &&
-                !txtDNI.getText().trim().isEmpty() &&
-                !txtTelefono.getText().trim().isEmpty() &&
-                !txtCorreo.getText().trim().isEmpty() &&
-                !habilitarActualiar
-                ){
-            
+
+        if (!txtNombre.getText().trim().isEmpty()
+                && !txtApellidos.getText().trim().isEmpty()
+                && !txtDNI.getText().trim().isEmpty()
+                && !txtTelefono.getText().trim().isEmpty()
+                && !txtCorreo.getText().trim().isEmpty()
+                && !habilitarActualiar) {
+            if (!txtNombre.getText().matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+") || !txtApellidos.getText().matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+") ) {
+                JOptionPane.showMessageDialog(null, "Los nombres y apellidos solo puede contener letras", "Error", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            if (!txtDNI.getText().matches("[0-9]{8}")) {
+                JOptionPane.showMessageDialog(null, "El DNI solo puede contener 8 dígitos numéricos", "Error", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            if (!txtTelefono.getText().matches("9[0-9]{8}")) {
+                JOptionPane.showMessageDialog(null, "Número de teléfono inválido", "Error", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            if (!txtCorreo.getText().matches("^[a-zA-Z0-9._%+\\-]+@(gmail|hotmail|yahoo|outlook)\\.com$")) {
+                JOptionPane.showMessageDialog(null, "Correo electrónico inválido", "Error", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             mc.setDatosCliente(txtNombre.getText().trim(),
-                                txtApellidos.getText().trim(),
-                                Integer.parseInt(txtDNI.getText().trim()),
-                                Integer.parseInt(txtTelefono.getText().trim()),
-                                txtCorreo.getText().trim());
+                    txtApellidos.getText().trim(),
+                    Integer.parseInt(txtDNI.getText().trim()),
+                    Integer.parseInt(txtTelefono.getText().trim()),
+                    txtCorreo.getText().trim());
             mc.agregar();
-            cargarClientesTabla();
-            
+            listarClientesTabla();
+
             txtNombre.setText("");
             txtApellidos.setText("");
             txtDNI.setText("");
             txtTelefono.setText("");
             txtCorreo.setText("");
-            
+
             JOptionPane.showConfirmDialog(null, "Cliente agregado éxitosamente", "Cliente agregado", JOptionPane.DEFAULT_OPTION);
         }
     }//GEN-LAST:event_btnAgregarActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-        if(tClientes.getSelectedRow() != -1){
+        if (tClientes.getSelectedRow() != -1) {
             int filaSeleccionada = tClientes.getSelectedRow();
             int idCliente = (int) tClientes.getValueAt(filaSeleccionada, 0);
-            
+
             mc.setIdCliente(idCliente);
             mc.eliminar();
-            
+
             dtm.removeRow(filaSeleccionada);
             JOptionPane.showMessageDialog(null, "Cliente eliminado exitosamente");
         } else {
@@ -195,50 +215,50 @@ public final class GestionClientesPanel extends javax.swing.JPanel {
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void btnActualziarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualziarActionPerformed
-        if(habilitarActualiar){
-            
+        if (habilitarActualiar) {
+
             mc.setIdCliente((int) dtm.getValueAt(tClientes.getSelectedRow(), 0));
             mc.setDatosCliente(txtNombre.getText().trim(),
                     txtApellidos.getText().trim(),
                     Integer.parseInt(txtDNI.getText().trim()),
                     Integer.parseInt(txtTelefono.getText().trim()),
                     txtCorreo.getText().trim());
-            
+
             mc.actualizar();
-            
+
             habilitarActualiar = false;
-            
+
             txtNombre.setText("");
             txtApellidos.setText("");
             txtDNI.setText("");
             txtTelefono.setText("");
             txtCorreo.setText("");
-            
+
             btnAgregar.setEnabled(true);
             btnEliminar.setEnabled(true);
             btnReporte.setEnabled(true);
-            
-            cargarClientesTabla();
-            
+
+            listarClientesTabla();
+
             JOptionPane.showMessageDialog(null, "Cliente actualizado exitosamente");
-            
+
         } else {
             JOptionPane.showMessageDialog(null, "Por favor, edite un campo primero", "Error al editar", JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_btnActualziarActionPerformed
 
     private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
-        
-        if(!(tClientes.getSelectedRow() == -1)){
-            
+
+        if (!(tClientes.getSelectedRow() == -1)) {
+
             habilitarActualiar = true;
-            
+
             txtNombre.setText(dtm.getValueAt(tClientes.getSelectedRow(), 1).toString());
             txtApellidos.setText(dtm.getValueAt(tClientes.getSelectedRow(), 2).toString());
             txtDNI.setText(dtm.getValueAt(tClientes.getSelectedRow(), 3).toString());
             txtTelefono.setText(dtm.getValueAt(tClientes.getSelectedRow(), 4).toString());
             txtCorreo.setText(dtm.getValueAt(tClientes.getSelectedRow(), 5).toString());
-            
+
             btnAgregar.setEnabled(false);
             btnEliminar.setEnabled(false);
             btnReporte.setEnabled(false);
@@ -246,22 +266,7 @@ public final class GestionClientesPanel extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(null, "No ha seleccionado una fila", "Error al actuakizar", JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_btnEditarActionPerformed
-    
-    private void cargarClientesTabla(){
-        dtm.setRowCount(0);
 
-        for (int i = 0; i < banco.getClientes().length - 1; i++) {
-            obj[0] = banco.getClientes()[i].getIdCliente();
-            obj[1] = banco.getClientes()[i].getNombres();
-            obj[2] = banco.getClientes()[i].getApellidos();
-            obj[3] = banco.getClientes()[i].getDni();
-            obj[4] = banco.getClientes()[i].getTelefono();
-            obj[5] = banco.getClientes()[i].getCorreo();
-            
-            dtm.addRow(obj);
-        }
-    }
-    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnActualziar;
     private javax.swing.JButton btnAgregar;
@@ -283,8 +288,8 @@ public final class GestionClientesPanel extends javax.swing.JPanel {
     private javax.swing.JTextField txtTelefono;
     // End of variables declaration//GEN-END:variables
 
-       public JTable getTablaCliente(){
-           return tClientes;
-       }
+    public JTable getTablaCliente() {
+        return tClientes;
+    }
 
 }

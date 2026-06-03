@@ -2,21 +2,21 @@ package org.banco.modelos;
 
 import org.banco.modelos.enums.EstadoCuenta;
 import org.banco.modelos.enums.Moneda;
+import org.banco.modelos.enums.TipoCuenta;
 
 public class Cuenta_Ahorro extends Cuenta{
 
+    private TipoCuenta tipoCuenta;
+    private int cantidadOperaciones;
+
     public Cuenta_Ahorro(Moneda tipoMoneda, EstadoCuenta estadoCuenta) {
         super(tipoMoneda, estadoCuenta);
-    }
-    
-    @Override
-    public String toString() {
-        return getTipoCuenta() +" | N° " + getNumeroCuenta();
+        this.tipoCuenta = TipoCuenta.AHORRO;
     }
 
     @Override
     public String getTipoCuenta() {
-        return "Cuenta de ahorro";
+        return tipoCuenta.toString();
     }
       
 }

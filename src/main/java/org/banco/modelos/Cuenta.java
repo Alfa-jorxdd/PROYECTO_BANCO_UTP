@@ -22,6 +22,8 @@ public abstract class Cuenta {
         saldo = 0;
     }
 
+
+
     private final void crearDigitosCuenta() {
         Random digito = new Random();
         StringBuilder sb = new StringBuilder();
@@ -60,7 +62,7 @@ public abstract class Cuenta {
     }
     
     public void setSaldo(double saldo) {
-        this.saldo = saldo;
+        this.saldo = this.saldo + saldo;
     }
 
     public void setEstadoCuenta(EstadoCuenta estadoCuenta) {
