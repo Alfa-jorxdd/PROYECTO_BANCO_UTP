@@ -35,6 +35,13 @@ public abstract class Cuenta {
 
         numeroCuenta = Long.parseLong(sb.toString());
     }
+    public abstract void depositar(double monto);
+    
+    public abstract void retirar(double monto);
+    
+    public abstract void consultar();
+    
+    public abstract void transferir(double montoEmisor, double montoReceptor);
 
     public Moneda getTipoMoneda() {
         return tipoMoneda;

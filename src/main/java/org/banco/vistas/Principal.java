@@ -3,6 +3,7 @@ package org.banco.vistas;
 import javax.swing.table.DefaultTableModel;
 import org.banco.modelos.Cuenta;
 import org.banco.modelos.Banco;
+import org.banco.modelos.enums.Moneda;
 
 public final class Principal extends javax.swing.JPanel {
 
@@ -35,8 +36,25 @@ public final class Principal extends javax.swing.JPanel {
     private void cargarDatos() {
         numClientes.setText(String.valueOf(banco.getClientes().length - 1));
         numCuentas.setText(String.valueOf(banco.getCuentas().length - 1));
+        
+        double saldoTotal = 0;
+        for (int i = 0; i < banco.getCuentas().length - 1; i++) {
+            if (banco.getCuentas()[i].getMoneda().equals(Moneda.SOL)) {
+                saldoTotal += banco.getCuentas()[i].getSaldo();
+            } 
+        }
+                
         numOperaciones.setText("0");
-        numSaldo.setText("S/" + "0");
+        numSaldo.setText(String.valueOf(saldoTotal));
+    }
+    
+    private void saldoTotalSoles(boolean enSoles){
+        double saldoTotal = 0;
+        for (int i = 0; i < banco.getCuentas().length - 1; i++) {
+            if (banco.getCuentas()[i].getMoneda().equals(Moneda.SOL)) {
+                saldoTotal += banco.getCuentas()[i].getSaldo();
+            } 
+        }
     }
 
     private void ponerUltimosClientesTabla() {

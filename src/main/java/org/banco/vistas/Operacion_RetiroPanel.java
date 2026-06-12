@@ -9,7 +9,7 @@ import org.banco.modelos.Banco;
 import org.banco.modelos.Cliente;
 import org.banco.modelos.enums.Moneda;
 
-public class Operacion_DepositoPanel extends javax.swing.JPanel {
+public class Operacion_RetiroPanel extends javax.swing.JPanel {
 
     private Banco banco;
     private DefaultListModel<String> modeloListaCuenta = new DefaultListModel<>();
@@ -17,7 +17,7 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
     private DefaultListModel<String> modeloListaDNI = new DefaultListModel<>();
     private DefaultListModel<String> modeloResultadosDNI = new DefaultListModel<>();
 
-    public Operacion_DepositoPanel(Banco banco) {
+    public Operacion_RetiroPanel(Banco banco) {
         initComponents();
         InitStyles();
 
@@ -135,7 +135,7 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
         labelDeposito = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
-        btnDepositar = new javax.swing.JButton();
+        btnRetirar = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         txtNumeroCuenta = new javax.swing.JTextField();
         labelNumeroCuenta = new javax.swing.JLabel();
@@ -156,9 +156,9 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
 
         bg.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        labelDeposito.setText("Depósito");
+        labelDeposito.setText("Retiro");
 
-        jLabel4.setText("Agrega fondos a una cuenta Bancaria");
+        jLabel4.setText("Retira fondos de una cuenta Bancaria");
 
         javax.swing.GroupLayout panelTitulosLayout = new javax.swing.GroupLayout(panelTitulos);
         panelTitulos.setLayout(panelTitulosLayout);
@@ -183,10 +183,10 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
 
         bg.add(panelTitulos, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
-        btnDepositar.setText("Confirmar depósito");
-        btnDepositar.addActionListener(new java.awt.event.ActionListener() {
+        btnRetirar.setText("Confirmar retiro");
+        btnRetirar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDepositarActionPerformed(evt);
+                btnRetirarActionPerformed(evt);
             }
         });
 
@@ -196,14 +196,14 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(22, 22, 22)
-                .addComponent(btnDepositar, javax.swing.GroupLayout.PREFERRED_SIZE, 470, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnRetirar, javax.swing.GroupLayout.PREFERRED_SIZE, 470, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(26, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGap(15, 15, 15)
-                .addComponent(btnDepositar, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(btnRetirar, javax.swing.GroupLayout.PREFERRED_SIZE, 48, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(17, Short.MAX_VALUE))
         );
 
@@ -306,12 +306,10 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
         }
     }
 
-    private void btnDepositarActionPerformed(java.awt.event.ActionEvent evt) {                                             
+    private void btnRetirarActionPerformed(java.awt.event.ActionEvent evt) {                                             
         if (txtNumeroCuenta.getText().trim().isEmpty() 
                 || txtDNI.getText().trim().isEmpty() 
-                || txtMonto.getText().trim().isEmpty()
-                || boxTipoMoneda.getSelectedIndex() == 0 ) {
-                
+                || txtMonto.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Todos los campos deben estar llenos", "Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
@@ -333,7 +331,7 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
         int DNI = Integer.parseInt(txtDNI.getText().trim());
         Moneda monedaOperacion = Moneda.values()[boxTipoMoneda.getSelectedIndex() - 1];
         
-        mo.depositar(numeroCuenta, monto, monedaOperacion);
+        mo.retirar(numeroCuenta, monto, monedaOperacion);
         
         txtNumeroCuenta.setText("");
         txtDNI.setText("");
@@ -345,7 +343,7 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bg;
     private javax.swing.JComboBox<String> boxTipoMoneda;
-    private javax.swing.JButton btnDepositar;
+    private javax.swing.JButton btnRetirar;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
