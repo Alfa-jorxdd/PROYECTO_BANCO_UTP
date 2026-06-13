@@ -1,7 +1,7 @@
 package org.banco.modelos;
 
-import org.banco.modelos.enums.Moneda;
-import org.banco.modelos.enums.TipoOperacion;
+import org.banco.enums.Moneda;
+import org.banco.enums.TipoOperacion;
 
 import java.time.LocalDate;
 

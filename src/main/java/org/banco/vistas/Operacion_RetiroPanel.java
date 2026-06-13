@@ -7,7 +7,7 @@ import javax.swing.event.DocumentListener;
 import org.banco.mantenimiento.MantenimientoOperacion;
 import org.banco.modelos.Banco;
 import org.banco.modelos.Cliente;
-import org.banco.modelos.enums.Moneda;
+import org.banco.enums.Moneda;
 
 public class Operacion_RetiroPanel extends javax.swing.JPanel {
 

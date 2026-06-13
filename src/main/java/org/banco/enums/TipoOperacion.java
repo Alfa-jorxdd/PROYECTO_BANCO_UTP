@@ -1,4 +1,4 @@
-package org.banco.modelos.enums;
+package org.banco.enums;
 
 public enum TipoOperacion {
     DEPOSITO,

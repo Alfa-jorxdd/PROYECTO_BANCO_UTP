@@ -1,8 +1,8 @@
 package org.banco.modelos;
 
-import org.banco.modelos.enums.EstadoCuenta;
-import org.banco.modelos.enums.Moneda;
-import org.banco.modelos.enums.TipoCuenta;
+import org.banco.enums.EstadoCuenta;
+import org.banco.enums.Moneda;
+import org.banco.enums.TipoCuenta;
 
 public class Cuenta_Mancomunada extends Cuenta {
 

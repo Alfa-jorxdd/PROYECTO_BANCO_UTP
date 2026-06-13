@@ -1,12 +1,9 @@
 package org.banco.mantenimiento;
 
-import javax.swing.JOptionPane;
 import org.banco.modelos.Banco;
 import org.banco.modelos.Cuenta;
-import org.banco.modelos.enums.Moneda;
-import static org.banco.modelos.enums.Moneda.DOLAR;
-import static org.banco.modelos.enums.Moneda.SOL;
-import org.banco.modelos.interfaces.Operable;
+import org.banco.enums.Moneda;
+import org.banco.interfaces.Operable;
 
 public class MantenimientoOperacion implements Operable {
 

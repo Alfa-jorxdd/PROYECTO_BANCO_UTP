@@ -4,9 +4,9 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
-import org.banco.modelos.enums.EstadoCuenta;
-import org.banco.modelos.enums.Moneda;
-import org.banco.modelos.enums.TipoCuenta;
+import org.banco.enums.EstadoCuenta;
+import org.banco.enums.Moneda;
+import org.banco.enums.TipoCuenta;
 
 public class Banco {
 

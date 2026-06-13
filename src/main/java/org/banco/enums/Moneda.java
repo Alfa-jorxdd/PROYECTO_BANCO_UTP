@@ -1,4 +1,4 @@
-package org.banco.modelos.enums;
+package org.banco.enums;
 
 public enum Moneda {
     SOL(1.0, "S/"),

@@ -1,12 +1,16 @@
 package org.banco.mantenimiento;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import javax.swing.JOptionPane;
 import org.banco.modelos.*;
 
 import javax.swing.table.DefaultTableModel;
-import org.banco.modelos.enums.EstadoCuenta;
-import org.banco.modelos.enums.Moneda;
-import org.banco.modelos.enums.TipoCuenta;
-import org.banco.modelos.interfaces.Gestionable;
+import org.banco.enums.EstadoCuenta;
+import org.banco.enums.Moneda;
+import org.banco.enums.TipoCuenta;
+import org.banco.interfaces.Gestionable;
 
 public class MantenimientoCuenta implements Gestionable {
 
@@ -35,6 +39,7 @@ public class MantenimientoCuenta implements Gestionable {
             Cliente nuevoCliente = banco.buscarIdCliente(idClientes[0]);
             banco.agregarListaCliente_Cuenta(nuevoCliente, nuevaCuenta);
         }
+        JOptionPane.showMessageDialog(null, "Cuenta agregada exitosamente");
     }
 
     @Override
@@ -43,6 +48,7 @@ public class MantenimientoCuenta implements Gestionable {
         int indiceCuenta = banco.buscarIndiceCuenta(idCuenta);
         banco.disminuirListaCuentas(indiceCuenta);
 
+        JOptionPane.showMessageDialog(null, "Cuenta eliminada exitosamente");
     }
 
     @Override
@@ -59,38 +65,91 @@ public class MantenimientoCuenta implements Gestionable {
             Cliente nuevoCliente = banco.buscarIdCliente(idClientes[i]);
             banco.agregarListaCliente_Cuenta(nuevoCliente, cuenta);
         }
+        JOptionPane.showMessageDialog(null, "Cuenta actualizada exitosamente");
     }
 
     @Override
-    public void listar(DefaultTableModel dtm, Object[] obj) {
+    public void listar(DefaultTableModel dtm, boolean ascendete, int criterioOrden, int criterioFiltrado, String textoFiltrar) {
         dtm.setRowCount(0);
-
-        for (int i = 0; i < banco.getCuentas().length - 1; i++) {
-
-            int idCuenta = banco.getCuentas()[i].getIdCuenta();
-            obj[0] = idCuenta;
-            obj[1] = banco.getCuentas()[i].getTipoCuenta();
-            obj[2] = banco.getCuentas()[i].getEstadoCuenta();
-            obj[3] = banco.getCuentas()[i].getNumeroCuenta();
-
-            Cliente[] clientes = banco.buscarClientesPorIdCuenta(idCuenta);
-
-            if (clientes.length > 1) {
-                for (int j = 0; j < clientes.length; j++) {
-                    obj[4] = clientes[j].getNombres() + " " + clientes[j].getApellidos();
-                    obj[5] = banco.getCuentas()[i].getSaldo();
-                    obj[6] = banco.getCuentas()[i].getMoneda();
-
-                    dtm.addRow(obj);
-                }
-            } else {
-                obj[4] = clientes[0].getNombres() + " " + clientes[0].getApellidos();
-                obj[5] = banco.getCuentas()[i].getSaldo();
-                obj[6] = banco.getCuentas()[i].getMoneda();
-
-                dtm.addRow(obj);
+        
+        List<List<Object[]>> bloque = construirBloque();
+        
+        bloque = filtrar(criterioFiltrado, bloque, textoFiltrar);
+        
+        Comparator<List<Object[]>> comparador = null;
+        switch (criterioOrden) {
+            case 0 ://Ordenar por ID
+                comparador = (o1, o2) -> Integer.compare((int)o1.get(0)[0], (int)o2.get(0)[0]); break;
+            case 1 : //Ordenar por tipo de cuenta
+                comparador = (o1, o2) -> o1.get(0)[1].toString().compareTo(o2.get(0)[1].toString()); break;
+            case 2 : //Ordenar por estado de cuenta
+                comparador = (o1, o2) -> o1.get(0)[2].toString().compareTo(o2.get(0)[2].toString()); break;
+            case 3 : //Ordenar por numero de cuenta
+                comparador = (o1, o2) -> Long.compare((long)o1.get(0)[3], (long)o2.get(0)[3]); break;
+            case 4 : //Ordenar por saldo
+                comparador = (o1, o2) -> Double.compare((double)o1.get(0)[5], (double)o2.get(0)[5]); break;
+            case 5 : //Ordenar por Moneda
+                comparador = (o1, o2) -> o1.get(0)[6].toString().compareTo(o2.get(0)[6].toString()); break;
+        }
+        bloque.sort(ascendete ? comparador : comparador.reversed());
+        
+        
+        
+        dtm.setRowCount(0);
+        for (List<Object[]> filas : bloque) {
+            for (Object[] fila : filas) {
+                dtm.addRow(fila);
             }
         }
+    }
+    
+    private List<List<Object[]>> filtrar(int criterioFiltrado, List<List<Object[]>> bloque, String textoFiltrar){
+        if (textoFiltrar.trim().isEmpty()) {
+            return bloque;
+        }
+        if (criterioFiltrado > 3) {
+            criterioFiltrado++;
+        }
+        
+        List<List<Object[]>> bloqueFiltrado = new ArrayList<>();
+        String texto = textoFiltrar.trim().toLowerCase();
+        
+        for (List<Object[]> filas : bloque) {
+            boolean concide = false;
+            for (Object[] fila : filas) {
+                if (fila[criterioFiltrado].toString().toLowerCase().contains(texto)) {
+                    concide = true;
+                    break;
+                }
+            }
+            if (concide) bloqueFiltrado.add(filas);
+        }
+        return bloqueFiltrado;
+    }
+    
+    
+    private List<List<Object[]>> construirBloque() {
+        List<List<Object[]>> bloque = new ArrayList<>();
+
+        for (int i = 0; i < banco.getCuentas().length - 1; i++) {
+            int idCuenta = banco.getCuentas()[i].getIdCuenta();
+            Cliente[] titulares = banco.buscarClientesPorIdCuenta(idCuenta);
+
+            List<Object[]> filas = new ArrayList<>();
+            for (int j = 0; j < titulares.length; j++) {
+                Object[] cuentaDeFila = new Object[7];
+                cuentaDeFila[0] = idCuenta;
+                cuentaDeFila[1] = banco.getCuentas()[i].getTipoCuenta();
+                cuentaDeFila[2] = banco.getCuentas()[i].getEstadoCuenta();
+                cuentaDeFila[3] = banco.getCuentas()[i].getNumeroCuenta();
+                cuentaDeFila[4] = titulares[j].getNombres() + " " + titulares[j].getApellidos();
+                cuentaDeFila[5] = banco.getCuentas()[i].getSaldo();
+                cuentaDeFila[6] = banco.getCuentas()[i].getMoneda();
+                filas.add(cuentaDeFila);
+            }
+            bloque.add(filas);
+        }
+        return bloque;
     }
 
     public void setDatosCuenta(TipoCuenta tipoCuenta, EstadoCuenta estadoCuenta, Moneda tipoMoneda) {

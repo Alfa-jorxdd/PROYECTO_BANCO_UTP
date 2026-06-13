@@ -1,9 +1,9 @@
 package org.banco.modelos;
 
 import java.util.Random;
-import org.banco.modelos.enums.EstadoCuenta;
-import org.banco.modelos.enums.Moneda;
-import org.banco.modelos.enums.TipoCuenta;
+import org.banco.enums.EstadoCuenta;
+import org.banco.enums.Moneda;
+import org.banco.enums.TipoCuenta;
 
 public abstract class Cuenta {
     private static int incrementarId = 0;

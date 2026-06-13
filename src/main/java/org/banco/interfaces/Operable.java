@@ -1,6 +1,6 @@
-package org.banco.modelos.interfaces;
+package org.banco.interfaces;
 
-import org.banco.modelos.enums.Moneda;
+import org.banco.enums.Moneda;
 
 public interface Operable {
     void depositar(long numeroCuenta, double monto, Moneda monedaOperacion);

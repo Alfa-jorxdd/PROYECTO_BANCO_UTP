@@ -10,9 +10,9 @@ import javax.swing.table.DefaultTableModel;
 import org.banco.mantenimiento.MantenimientoCuenta;
 import org.banco.modelos.Banco;
 import org.banco.modelos.Cliente;
-import org.banco.modelos.enums.EstadoCuenta;
-import org.banco.modelos.enums.Moneda;
-import org.banco.modelos.enums.TipoCuenta;
+import org.banco.enums.EstadoCuenta;
+import org.banco.enums.Moneda;
+import org.banco.enums.TipoCuenta;
 
 public class GestionCuentasPanel extends javax.swing.JPanel {
 
@@ -23,6 +23,8 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
     private final DefaultListModel<String> modeloTitulares = new DefaultListModel<>();
     private final DefaultTableModel dtm;
     private final Object[] obj = new Object[7];
+
+    private boolean ascendente = true;
 
     private boolean habilitarActualizar = false;
 
@@ -37,6 +39,8 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
 
         cargarModeloLista();
         listResultados.setModel(modeloResultados);
+        listarCuentasTabla();
+        btnAscDesc.setText("Desc");
 
         txtBuscarTitular.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -74,12 +78,28 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
             }
         });
 
-        listarCuentasTabla();
+        txtBuscarCuenta.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                listarCuentasTabla();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                listarCuentasTabla();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+
+            }
+        });
     }
-    
+
     private void initStyles() {
         tCuentas.setShowVerticalLines(true);
     }
+
     //Llena modeloLista con todos los nombres y apellidos de cada cliente
     private void cargarModeloLista() {
         modeloLista.removeAllElements();
@@ -88,6 +108,7 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
             modeloLista.addElement(c.getNombres() + " " + c.getApellidos());
         }
     }
+
     //Desactiva el JComboBox de TipoCuenta si hay más de un elemento en el modelTitulares
     //También verifica que, si el JComboBox ya ha estado desahibitado, entonces que no lo vuelva a activar
     private void verificarEsMancomunada() {
@@ -104,6 +125,7 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
             }
         }
     }
+
     //Encuentra coincidencias con los elementos del modeloLista
     private void filtrarModel() {
         String texto = txtBuscarTitular.getText().trim().toLowerCase();
@@ -116,6 +138,7 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
             }
         }
     }
+
     //Devuelte true si todos los campos no están vacíos
     private boolean camposValidos() {
         boolean esValido = modeloTitulares.getSize() != 0
@@ -123,28 +146,31 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
                 && boxEstado.getSelectedIndex() != 0
                 && boxMoneda.getSelectedIndex() != 0;
 
-        return esValido;
+        if (esValido) {
+            return esValido;
+        } else {
+            JOptionPane.showMessageDialog(null, "Campos inválidos. Por favor, llene todos los campos", "Error", JOptionPane.WARNING_MESSAGE);
+            return esValido;
+        }
     }
-    //Habilita o deshabilita los botones de agregar, eliminar y reporte
-    private void habilitarBotones(boolean operador) {
-        btnAgregar.setEnabled(operador);
-        btnEliminar.setEnabled(operador);
-        btnReporte.setEnabled(operador);
-    }
+
     //Llena toda la tabla de cuentas llamando al metodo listar de la clase Mantenimiento Cuenta
     private void listarCuentasTabla() {
-        mc.listar(dtm, obj);
+        mc.listar(dtm, ascendente, boxOrdenarPor.getSelectedIndex(), boxBuscarPor.getSelectedIndex(), txtBuscarCuenta.getText());
     }
+
     //Limpia todos los campos del formulario
     private void limpiarFormulario() {
         modeloTitulares.removeAllElements();
         boxTpoCuenta.setSelectedIndex(0);
         boxEstado.setSelectedIndex(0);
         boxMoneda.setSelectedIndex(0);
+        txtBuscarTitular.setText("");
+        btnAgregar_Actualizar.setText("Agregar");
     }
-    
+
     //Agrega o actualiza la lista de cuenta y cliente_cuenta según los campos en el formulario
-    private void AgregarOActualizar() {
+    private void enviarDatosMC() {
         EstadoCuenta estado = EstadoCuenta.values()[boxEstado.getSelectedIndex() - 1];
         Moneda moneda = Moneda.values()[boxMoneda.getSelectedIndex() - 1];
 
@@ -162,6 +188,33 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
         }
     }
 
+    private void agregar() {
+        enviarDatosMC();
+        mc.agregar();
+    }
+
+    private void actualizar() {
+        mc.setIdCuenta((int) dtm.getValueAt(tCuentas.getSelectedRow(), 0));
+        enviarDatosMC();
+        mc.actualizar();
+    }
+
+    private void eliminar() {
+        if (tCuentas.getSelectedRow() != -1) {
+
+            int filaSeleccionada = tCuentas.getSelectedRow();
+            int idCuenta = (int) dtm.getValueAt(filaSeleccionada, 0);
+
+            mc.setIdCuenta(idCuenta);
+            mc.eliminar();
+
+            listarCuentasTabla();
+
+        } else {
+            JOptionPane.showMessageDialog(null, "Por favor, elija una cuenta primero", "Error al eliminar", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -171,9 +224,8 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tCuentas = new javax.swing.JTable();
-        btnAgregar = new javax.swing.JButton();
         btnEliminar = new javax.swing.JButton();
-        btnActualizar = new javax.swing.JButton();
+        btnAgregar_Actualizar = new javax.swing.JButton();
         boxTpoCuenta = new javax.swing.JComboBox<>();
         boxEstado = new javax.swing.JComboBox<>();
         btnReporte = new javax.swing.JButton();
@@ -186,18 +238,25 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
         listTitulares = new javax.swing.JList<>();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        btnEditar = new javax.swing.JButton();
         btnEliminarTitular = new javax.swing.JButton();
+        txtBuscarCuenta = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
+        boxBuscarPor = new javax.swing.JComboBox<>();
+        jLabel7 = new javax.swing.JLabel();
+        boxOrdenarPor = new javax.swing.JComboBox<>();
+        jLabel8 = new javax.swing.JLabel();
+        btnAscDesc = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
 
         setPreferredSize(new java.awt.Dimension(799, 435));
 
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel1.setText("Tipo Cuenta:");
-        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 0, 80, 20));
+        jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 10, 80, 20));
 
         jLabel2.setText("Estado:");
-        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 40, -1, 20));
+        jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 10, -1, 20));
 
         tCuentas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -215,6 +274,11 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
                 return canEdit [columnIndex];
             }
         });
+        tCuentas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tCuentasMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tCuentas);
         if (tCuentas.getColumnModel().getColumnCount() > 0) {
             tCuentas.getColumnModel().getColumn(0).setResizable(false);
@@ -229,15 +293,7 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
             tCuentas.getColumnModel().getColumn(6).setPreferredWidth(20);
         }
 
-        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 130, 780, 300));
-
-        btnAgregar.setText("Agregar");
-        btnAgregar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnAgregarActionPerformed(evt);
-            }
-        });
-        jPanel1.add(btnAgregar, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 10, 90, 30));
+        jPanel1.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 130, 780, 240));
 
         btnEliminar.setText("Eliminar");
         btnEliminar.addActionListener(new java.awt.event.ActionListener() {
@@ -245,30 +301,30 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
                 btnEliminarActionPerformed(evt);
             }
         });
-        jPanel1.add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 50, 90, 30));
+        jPanel1.add(btnEliminar, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 90, 90, 30));
 
-        btnActualizar.setText("Actualizar");
-        btnActualizar.addActionListener(new java.awt.event.ActionListener() {
+        btnAgregar_Actualizar.setText("Agregar");
+        btnAgregar_Actualizar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnActualizarActionPerformed(evt);
+                btnAgregar_ActualizarActionPerformed(evt);
             }
         });
-        jPanel1.add(btnActualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 10, 90, 30));
+        jPanel1.add(btnAgregar_Actualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 90, 90, 30));
 
         boxTpoCuenta.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Niguno", "Ahorro", "Corriente", "Mancomunada" }));
-        jPanel1.add(boxTpoCuenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 20, 120, 20));
+        jPanel1.add(boxTpoCuenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 30, 100, 20));
 
         boxEstado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ninguno", "ACTIVA", "BLOQUEADA" }));
-        jPanel1.add(boxEstado, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 60, 120, -1));
+        jPanel1.add(boxEstado, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 30, -1, -1));
 
         btnReporte.setText("Reporte");
-        jPanel1.add(btnReporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 90, 90, 30));
+        jPanel1.add(btnReporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 90, 90, 30));
 
         jLabel4.setText("Moneda:");
-        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 80, -1, -1));
+        jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 10, -1, -1));
 
         boxMoneda.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ninguno", "SOL", "DOLAR" }));
-        jPanel1.add(boxMoneda, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 100, 120, -1));
+        jPanel1.add(boxMoneda, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 30, 100, -1));
         jPanel1.add(txtBuscarTitular, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 30, 190, -1));
 
         listResultados.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
@@ -284,19 +340,11 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
 
         jPanel1.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 30, 180, 60));
 
-        jLabel5.setText("Buscar Titular");
+        jLabel5.setText("Agregar Titular");
         jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 10, -1, -1));
 
         jLabel6.setText("Titulares agregados");
         jPanel1.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 10, -1, -1));
-
-        btnEditar.setText("Editar");
-        btnEditar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnEditarActionPerformed(evt);
-            }
-        });
-        jPanel1.add(btnEditar, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 100, -1, 20));
 
         btnEliminarTitular.setText("Eliminar titular");
         btnEliminarTitular.addActionListener(new java.awt.event.ActionListener() {
@@ -304,7 +352,44 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
                 btnEliminarTitularActionPerformed(evt);
             }
         });
-        jPanel1.add(btnEliminarTitular, new org.netbeans.lib.awtextra.AbsoluteConstraints(297, 100, 110, -1));
+        jPanel1.add(btnEliminarTitular, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 100, 110, -1));
+        jPanel1.add(txtBuscarCuenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 400, 180, -1));
+
+        jLabel3.setText("Buscar cuenta:");
+        jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 380, -1, -1));
+
+        boxBuscarPor.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ID", "Tipo", "Estado", "N°cuenta", "Saldo", "Moneda" }));
+        jPanel1.add(boxBuscarPor, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 400, 110, -1));
+
+        jLabel7.setText("Buscar por:");
+        jPanel1.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(200, 380, -1, -1));
+
+        boxOrdenarPor.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "ID", "Tipo", "Estado", "N°cuenta", "Saldo", "Moneda" }));
+        boxOrdenarPor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                boxOrdenarPorActionPerformed(evt);
+            }
+        });
+        jPanel1.add(boxOrdenarPor, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 400, 110, -1));
+
+        jLabel8.setText("Ordenar por:");
+        jPanel1.add(jLabel8, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 380, -1, -1));
+
+        btnAscDesc.setText("Asc");
+        btnAscDesc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAscDescActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnAscDesc, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 400, -1, -1));
+
+        jButton1.setText("Cancelar");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+        jPanel1.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 390, 90, 30));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -318,41 +403,11 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
-    
     //======================EVENTOS==========================
-    
+    //Elimina una cuenta seleccionada tanto de la lista de cuentas como de la tabla
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
-        if (tCuentas.getSelectedRow() != -1) {
-            
-            int filaSeleccionada = tCuentas.getSelectedRow();
-            int idCuenta = (int) dtm.getValueAt(filaSeleccionada, 0);
-            
-            mc.setIdCuenta(idCuenta);
-            mc.eliminar();
-            
-            listarCuentasTabla();
-            JOptionPane.showMessageDialog(null, "Cuenta elimiinada con éxito");
-            
-        } else {
-            JOptionPane.showMessageDialog(null, "Por favor, elija una cuenta primero", "Error al eliminar", JOptionPane.WARNING_MESSAGE);
-        }
+        eliminar();
     }//GEN-LAST:event_btnEliminarActionPerformed
-    
-    //Agrega una cuenta a la lista de cuentas y agrega relaciones a la lista cliente_cuenta
-    private void btnAgregarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregarActionPerformed
-        if (camposValidos() && !habilitarActualizar) {
-
-            AgregarOActualizar();
-            mc.agregar();
-
-            limpiarFormulario();
-
-            listarCuentasTabla();
-            JOptionPane.showMessageDialog(null, "Cuenta agregada exitosamente");
-        } else {
-            JOptionPane.showMessageDialog(null, "Por favor, llena todos los campos", "Error al agregar cuenta", JOptionPane.WARNING_MESSAGE);
-        }
-    }//GEN-LAST:event_btnAgregarActionPerformed
 
     //Agregar el elemento seleccionado de la listaResultados a la listaTiturares
     private void listResultadosValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_listResultadosValueChanged
@@ -372,22 +427,33 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
             }
         }
     }//GEN-LAST:event_listResultadosValueChanged
-    
+
     //Eliminar el elemento seleccionado de la listaTitulares
     private void btnEliminarTitularActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarTitularActionPerformed
-
         int indice = listTitulares.getSelectedIndex();
         if (indice != -1) {
             modeloTitulares.removeElementAt(indice);
         }
     }//GEN-LAST:event_btnEliminarTitularActionPerformed
-    
-    //Llena el formulario con la fila seleccionada
-    private void btnEditarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarActionPerformed
-        if (tCuentas.getSelectedRow() != -1) {
 
-            habilitarActualizar = true;
-            
+    //Agrega o actualiza tanto la lista de cuentas como la tabla
+    private void btnAgregar_ActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgregar_ActualizarActionPerformed
+        if (!camposValidos()) {
+            return;
+        }
+        if (btnAgregar_Actualizar.getText().equals("Agregar")) {
+            agregar();
+        } else {
+            actualizar();
+        }
+
+        limpiarFormulario();
+        listarCuentasTabla();
+    }//GEN-LAST:event_btnAgregar_ActualizarActionPerformed
+
+    //Agrega los datos de una cuenta seleccionada a los campos existentes para su posterior actualización
+    private void tCuentasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tCuentasMouseClicked
+        if (evt.getClickCount() == 2) {
             modeloTitulares.removeAllElements();
 
             int idCuenta = (int) dtm.getValueAt(tCuentas.getSelectedRow(), 0);
@@ -400,7 +466,9 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
                 modeloTitulares.addElement(clientes[0].getNombres() + " " + clientes[0].getApellidos());
             }
 
-            boxTpoCuenta.setSelectedIndex(1);
+            TipoCuenta tipoCuenta = (TipoCuenta) dtm.getValueAt(tCuentas.getSelectedRow(), 1);
+            int indexTipoCuenta = tipoCuenta.ordinal() + 1;
+            boxTpoCuenta.setSelectedIndex(indexTipoCuenta);
             boxTpoCuenta.setEnabled(false);
 
             EstadoCuenta estado = (EstadoCuenta) dtm.getValueAt(tCuentas.getSelectedRow(), 2);
@@ -411,50 +479,48 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
             int indexMoneda = moneda.ordinal() + 1;
             boxMoneda.setSelectedIndex(indexMoneda);
 
-            habilitarBotones(false);
-
-        } else {
-            JOptionPane.showMessageDialog(null, "No ha seleccionado una fila", "Error al actuakizar", JOptionPane.WARNING_MESSAGE);
+            btnAgregar_Actualizar.setText("Actualizar");
         }
-    }//GEN-LAST:event_btnEditarActionPerformed
-    
-    //Actualiza la lista de cuentas junto a la lista de cliente_cuenta
-    private void btnActualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnActualizarActionPerformed
-        if (habilitarActualizar && camposValidos()) {
-            mc.setIdCuenta((int) dtm.getValueAt(tCuentas.getSelectedRow(), 0));
+    }//GEN-LAST:event_tCuentasMouseClicked
 
-            AgregarOActualizar();
-            mc.actualizar();
+    private void btnAscDescActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAscDescActionPerformed
+        ascendente = !ascendente;
+        btnAscDesc.setText(ascendente ? "Asc" : "Desc");
+        listarCuentasTabla();
+    }//GEN-LAST:event_btnAscDescActionPerformed
 
-            limpiarFormulario();
-            
-            habilitarActualizar = false;
-            habilitarBotones(true);
-            listarCuentasTabla();
-            
-            JOptionPane.showMessageDialog(null, "Cuenta actualziada exitosamente");
+    private void boxOrdenarPorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boxOrdenarPorActionPerformed
+        listarCuentasTabla();
+    }//GEN-LAST:event_boxOrdenarPorActionPerformed
 
-        } else {
-            JOptionPane.showMessageDialog(null, "Por favor, edite un campo primero", "Error al editar", JOptionPane.WARNING_MESSAGE);
-        }
-    }//GEN-LAST:event_btnActualizarActionPerformed
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        limpiarFormulario();
+        boxTpoCuenta.setEnabled(true);
+        boxTpoCuenta.setSelectedIndex(0);
+        txtBuscarCuenta.requestFocus();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> boxBuscarPor;
     private javax.swing.JComboBox<String> boxEstado;
     private javax.swing.JComboBox<String> boxMoneda;
+    private javax.swing.JComboBox<String> boxOrdenarPor;
     private javax.swing.JComboBox<String> boxTpoCuenta;
-    private javax.swing.JButton btnActualizar;
-    private javax.swing.JButton btnAgregar;
-    private javax.swing.JButton btnEditar;
+    private javax.swing.JButton btnAgregar_Actualizar;
+    private javax.swing.JButton btnAscDesc;
     private javax.swing.JButton btnEliminar;
     private javax.swing.JButton btnEliminarTitular;
     private javax.swing.JButton btnReporte;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
@@ -462,6 +528,7 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
     private javax.swing.JList<String> listResultados;
     private javax.swing.JList<String> listTitulares;
     private javax.swing.JTable tCuentas;
+    private javax.swing.JTextField txtBuscarCuenta;
     private javax.swing.JTextField txtBuscarTitular;
     // End of variables declaration//GEN-END:variables
 }

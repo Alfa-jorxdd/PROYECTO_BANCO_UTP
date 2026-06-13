@@ -3,7 +3,7 @@ package org.banco.vistas;
 import javax.swing.table.DefaultTableModel;
 import org.banco.modelos.Cuenta;
 import org.banco.modelos.Banco;
-import org.banco.modelos.enums.Moneda;
+import org.banco.enums.Moneda;
 
 public final class Principal extends javax.swing.JPanel {
 
