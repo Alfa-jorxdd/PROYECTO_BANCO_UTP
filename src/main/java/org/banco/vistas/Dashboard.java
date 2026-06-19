@@ -24,17 +24,15 @@ public final class Dashboard extends javax.swing.JFrame {
         
         bg.add(topBar, new AbsoluteConstraints(0,0,widthPanel,heigthPanel));
         bg.setComponentZOrder(topBar, 1);
-
+        
         this.setVisible(true);
         this.setLocationRelativeTo(null);
-
+        
         mostrarPanel(new Principal(banco), "Inicio");
         mostrarFecha();
-        
     }
     
     private void mostrarPanel(JPanel panel, String titulo){
-        
         panel.setSize(799, 435);
         panel.setLocation(0,0);
        
@@ -44,7 +42,6 @@ public final class Dashboard extends javax.swing.JFrame {
         panelMain.repaint();
         
         txtTitulo.setText(titulo);
-               
     }
 
     private void initStyles(){ 
@@ -60,7 +57,7 @@ public final class Dashboard extends javax.swing.JFrame {
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd MMM yyyy", new Locale("es", "PE"));
         txtFecha.setText(formato.format(fechaDeHoy));
     }
-
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -77,7 +74,6 @@ public final class Dashboard extends javax.swing.JFrame {
         btnInicio = new javax.swing.JButton();
         btnGestionClientes = new javax.swing.JButton();
         btnGestionCuentas = new javax.swing.JButton();
-        btnBuscar = new javax.swing.JButton();
         panelLogo = new javax.swing.JPanel();
         logoLabel = new javax.swing.JLabel();
         btnOperaciones = new javax.swing.JButton();
@@ -171,7 +167,7 @@ public final class Dashboard extends javax.swing.JFrame {
                 btnInicioActionPerformed(evt);
             }
         });
-        panelOptions.add(btnInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 220, 210, 40));
+        panelOptions.add(btnInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 250, 210, 40));
 
         btnGestionClientes.setText("Gestionar Clientes");
         btnGestionClientes.setBorder(null);
@@ -180,7 +176,7 @@ public final class Dashboard extends javax.swing.JFrame {
                 btnGestionClientesActionPerformed(evt);
             }
         });
-        panelOptions.add(btnGestionClientes, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 270, 210, 40));
+        panelOptions.add(btnGestionClientes, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 300, 210, 40));
 
         btnGestionCuentas.setText("Gestionar Cuentas");
         btnGestionCuentas.setBorder(null);
@@ -189,16 +185,7 @@ public final class Dashboard extends javax.swing.JFrame {
                 btnGestionCuentasActionPerformed(evt);
             }
         });
-        panelOptions.add(btnGestionCuentas, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 320, 210, 40));
-
-        btnBuscar.setText("Buscar");
-        btnBuscar.setBorder(null);
-        btnBuscar.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnBuscarActionPerformed(evt);
-            }
-        });
-        panelOptions.add(btnBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 420, 210, 40));
+        panelOptions.add(btnGestionCuentas, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 350, 210, 40));
 
         logoLabel.setHorizontalAlignment(javax.swing.SwingConstants.RIGHT);
         logoLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/LogoBankIntermedio.png"))); // NOI18N
@@ -229,7 +216,7 @@ public final class Dashboard extends javax.swing.JFrame {
                 btnOperacionesActionPerformed(evt);
             }
         });
-        panelOptions.add(btnOperaciones, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 370, 210, 40));
+        panelOptions.add(btnOperaciones, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 400, 210, 40));
 
         bg.add(panelOptions, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 70, 230, 590));
 
@@ -248,29 +235,24 @@ public final class Dashboard extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnInicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInicioActionPerformed
-         mostrarPanel(new Principal(banco), "Inicio");
+        mostrarPanel(new Principal(banco), "Inicio");
     }//GEN-LAST:event_btnInicioActionPerformed
-
+    
     private void btnGestionClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGestionClientesActionPerformed
         mostrarPanel(new GestionClientesPanel(banco), "Gestión de Clientes");
     }//GEN-LAST:event_btnGestionClientesActionPerformed
-
+    
     private void btnGestionCuentasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGestionCuentasActionPerformed
         mostrarPanel(new GestionCuentasPanel(banco), "Gestión de Cuentas");
     }//GEN-LAST:event_btnGestionCuentasActionPerformed
-
+    
     private void btnOperacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOperacionesActionPerformed
         mostrarPanel(new OperacionPanel(banco), "Operaciones");
     }//GEN-LAST:event_btnOperacionesActionPerformed
 
-    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        mostrarPanel(new BusquedaPanel(banco), "Busqueda");
-    }//GEN-LAST:event_btnBuscarActionPerformed
-
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel bg;
-    private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnGestionClientes;
     private javax.swing.JButton btnGestionCuentas;
     private javax.swing.JButton btnInicio;

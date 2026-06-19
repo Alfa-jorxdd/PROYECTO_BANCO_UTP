@@ -22,7 +22,6 @@ public class OperacionPanel extends javax.swing.JPanel {
     }
     
     private void MostarPanel(JPanel panel){
-        
         panel.setSize(518, 396);
         panel.setLocation(0,0);
        
@@ -42,6 +41,7 @@ public class OperacionPanel extends javax.swing.JPanel {
         btnTransferencia = new javax.swing.JButton();
         btnConsulta = new javax.swing.JButton();
         jButton5 = new javax.swing.JButton();
+        btnRegistroOperaciones = new javax.swing.JButton();
         panelMain = new javax.swing.JPanel();
 
         setPreferredSize(new java.awt.Dimension(799, 435));
@@ -70,8 +70,20 @@ public class OperacionPanel extends javax.swing.JPanel {
         });
 
         btnConsulta.setText("Consulta");
+        btnConsulta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnConsultaActionPerformed(evt);
+            }
+        });
 
         jButton5.setText("Reporte");
+
+        btnRegistroOperaciones.setText("Registro de opraciones");
+        btnRegistroOperaciones.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnRegistroOperacionesActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout btnDepositoLayout = new javax.swing.GroupLayout(btnDeposito);
         btnDeposito.setLayout(btnDepositoLayout);
@@ -84,20 +96,23 @@ public class OperacionPanel extends javax.swing.JPanel {
                     .addComponent(btnConsulta, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(btnTransferencia, javax.swing.GroupLayout.DEFAULT_SIZE, 209, Short.MAX_VALUE)
                     .addComponent(btnRetiro, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnDepositar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(btnDepositar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(btnRegistroOperaciones, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(15, 15, 15))
         );
         btnDepositoLayout.setVerticalGroup(
             btnDepositoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(btnDepositoLayout.createSequentialGroup()
-                .addGap(65, 65, 65)
+                .addGap(51, 51, 51)
                 .addComponent(btnDepositar, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnRetiro, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnTransferencia, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnConsulta, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(btnRegistroOperaciones, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(34, 34, 34))
@@ -150,7 +165,7 @@ public class OperacionPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnTransferenciaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnTransferenciaActionPerformed
-        // TODO add your handling code here:
+        MostarPanel(new Operacion_TransferenciaPanel(banco));
     }//GEN-LAST:event_btnTransferenciaActionPerformed
 
     private void btnDepositarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDepositarActionPerformed
@@ -161,11 +176,20 @@ public class OperacionPanel extends javax.swing.JPanel {
         MostarPanel(new Operacion_RetiroPanel(banco));
     }//GEN-LAST:event_btnRetiroActionPerformed
 
+    private void btnConsultaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnConsultaActionPerformed
+        MostarPanel(new Operacion_ConsultaPanel(banco));
+    }//GEN-LAST:event_btnConsultaActionPerformed
+
+    private void btnRegistroOperacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegistroOperacionesActionPerformed
+        MostarPanel(new Operacion_RegistroOperacionesPanel(banco));
+    }//GEN-LAST:event_btnRegistroOperacionesActionPerformed
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnConsulta;
     private javax.swing.JButton btnDepositar;
     private javax.swing.JPanel btnDeposito;
+    private javax.swing.JButton btnRegistroOperaciones;
     private javax.swing.JButton btnRetiro;
     private javax.swing.JButton btnTransferencia;
     private javax.swing.JButton jButton5;

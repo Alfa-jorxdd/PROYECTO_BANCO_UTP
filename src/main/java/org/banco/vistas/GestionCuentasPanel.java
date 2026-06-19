@@ -7,7 +7,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.table.DefaultTableModel;
-import org.banco.mantenimiento.MantenimientoCuenta;
+import org.banco.logica.mantenimiento.MantenimientoCuenta;
 import org.banco.modelos.Banco;
 import org.banco.modelos.Cliente;
 import org.banco.enums.EstadoCuenta;
@@ -19,10 +19,9 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
     private final Banco banco;
     private final MantenimientoCuenta mc;
     private final DefaultListModel<String> modeloResultados = new DefaultListModel<>();
-    private final DefaultListModel<String> modeloLista = new DefaultListModel<>();
+    private DefaultListModel<String> modeloLista = new DefaultListModel<>();
     private final DefaultListModel<String> modeloTitulares = new DefaultListModel<>();
     private final DefaultTableModel dtm;
-    private final Object[] obj = new Object[7];
 
     private boolean ascendente = true;
 
@@ -37,7 +36,8 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
         this.banco = banco;
         mc = new MantenimientoCuenta(banco);
 
-        cargarModeloLista();
+        modeloLista = mc.cargarModeloLista();
+        
         listResultados.setModel(modeloResultados);
         listarCuentasTabla();
         btnAscDesc.setText("Desc");
@@ -98,15 +98,6 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
 
     private void initStyles() {
         tCuentas.setShowVerticalLines(true);
-    }
-
-    //Llena modeloLista con todos los nombres y apellidos de cada cliente
-    private void cargarModeloLista() {
-        modeloLista.removeAllElements();
-        for (int i = 0; i < banco.getClientes().length - 1; i++) {
-            Cliente c = banco.getClientes()[i];
-            modeloLista.addElement(c.getNombres() + " " + c.getApellidos());
-        }
     }
 
     //Desactiva el JComboBox de TipoCuenta si hay más de un elemento en el modelTitulares
@@ -459,8 +450,8 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
             int idCuenta = (int) dtm.getValueAt(tCuentas.getSelectedRow(), 0);
             Cliente[] clientes = banco.buscarClientesPorIdCuenta(idCuenta);
             if (clientes.length > 1) {
-                for (int i = 0; i < clientes.length; i++) {
-                    modeloTitulares.addElement(clientes[i].getNombres() + " " + clientes[i].getApellidos());
+                for (Cliente cliente : clientes) {
+                    modeloTitulares.addElement(cliente.getNombres() + " " + cliente.getApellidos());
                 }
             } else {
                 modeloTitulares.addElement(clientes[0].getNombres() + " " + clientes[0].getApellidos());

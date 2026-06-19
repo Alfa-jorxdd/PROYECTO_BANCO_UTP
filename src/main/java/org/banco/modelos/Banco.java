@@ -7,6 +7,7 @@ import java.util.Scanner;
 import org.banco.enums.EstadoCuenta;
 import org.banco.enums.Moneda;
 import org.banco.enums.TipoCuenta;
+import org.banco.enums.TipoOperacion;
 
 public class Banco {
 
@@ -52,11 +53,21 @@ public class Banco {
             cliente_cuenta = extenderLista;
         }
     }
+    
+    public void extenderListaOperaciones(){
+        if (operaciones[operaciones.length - 1] != null) {
+            RegistroOperacion[] extenderLista = new RegistroOperacion[operaciones.length + 1];
+            
+            System.arraycopy(operaciones, 0, extenderLista, 0, operaciones.length);
+            
+            operaciones = extenderLista;
+        }
+    }
 
-    public void disminuirListaClientes(int indice) {
+    public void disminuirListaClientes(int idCliente) {
         Cliente[] disminuirLista = new Cliente[clientes.length - 1];
 
-        for (int i = indice; i < disminuirLista.length; i++) {
+        for (int i = idCliente; i < disminuirLista.length; i++) {
             clientes[i] = clientes[i + 1];
         }
 
@@ -65,10 +76,10 @@ public class Banco {
         setClientes(disminuirLista);
     }
 
-    public void disminuirListaCuentas(int indice) {
+    public void disminuirListaCuentas(int idCuenta) {
         Cuenta[] disminuirLista = new Cuenta[cuentas.length - 1];
 
-        for (int i = indice; i < disminuirLista.length; i++) {
+        for (int i = idCuenta; i < disminuirLista.length; i++) {
             cuentas[i] = cuentas[i + 1];
         }
 
@@ -113,6 +124,18 @@ public class Banco {
         }
         
         setCliente_cuenta(disminuirLista);
+    }
+    
+    public void dismunirListaOperaciones(int idOperacion){
+        RegistroOperacion[] disminuirLista = new RegistroOperacion[operaciones.length - 1];
+
+        for (int i = idOperacion; i < disminuirLista.length; i++) {
+            operaciones[i] = operaciones[i + 1];
+        }
+
+        System.arraycopy(operaciones, 0, disminuirLista, 0, disminuirLista.length);
+
+        setOperaciones(disminuirLista);
     }
 
     public void cargarClientes() throws Exception {  //CARGA LOS CLIENTES DEL ARCHIVO "LISTA_CLIENTES" Y LOS PONE EN EL ARRAY clientes, cuentas y cliente_cuenta
@@ -188,6 +211,22 @@ public class Banco {
         cliente_cuenta[cliente_cuenta.length - 1] = relacionClienteCuenta;
         
         extenderListaClienteCuenta();
+    }
+    
+    public RegistroOperacion agregarListaOperaciones(int[] idCuentas, int dniEmisor, TipoOperacion operacion, double monto, Moneda moneda){
+        RegistroOperacion nuevaOperacion = new RegistroOperacion(idCuentas, dniEmisor, operacion, monto, moneda);
+        operaciones[operaciones.length - 1] = nuevaOperacion;
+        extenderListaOperaciones();
+        
+        return nuevaOperacion;
+    }
+    
+    public RegistroOperacion agregarListaOperaciones(int idCuenta, TipoOperacion operacion){
+        RegistroOperacion nuevaOperacion = new RegistroOperacion(idCuenta, operacion);
+        operaciones[operaciones.length - 1] = nuevaOperacion;
+        extenderListaOperaciones();
+        
+        return nuevaOperacion;
     }
 
     public boolean existeCliente(int idCliente) { //VERIFICA QUE EL CLIENTE EXISTA POR EL ID
@@ -327,4 +366,13 @@ public class Banco {
     public void setCliente_cuenta(Cliente_Cuenta[] cliente_cuenta) {
         this.cliente_cuenta = cliente_cuenta;
     }
+
+    public RegistroOperacion[] getOperaciones() {
+        return operaciones;
+    }
+
+    public void setOperaciones(RegistroOperacion[] operaciones) {
+        this.operaciones = operaciones;
+    }
+    
 }

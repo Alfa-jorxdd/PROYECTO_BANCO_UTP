@@ -1,50 +1,36 @@
 package org.banco.modelos;
 
-import javax.swing.JOptionPane;
 import org.banco.enums.EstadoCuenta;
 import org.banco.enums.Moneda;
 import org.banco.enums.TipoCuenta;
 
 public class Cuenta_Corriente extends Cuenta{
 
-    private final double limiteSobregiro = -500;
-    private double acumulador;
+    private double limiteSobregiro;
+    private double acumuladorDeSobregiro;
+    private double montoLimitePorOperacion;
 
     public Cuenta_Corriente(Moneda tipoMoneda, EstadoCuenta estadoCuenta) {
         super(tipoMoneda, estadoCuenta, TipoCuenta.CORRIENTE);
-        acumulador = 0;
+        acumuladorDeSobregiro = 0;
+        convertirCamposEspecificos(tipoMoneda);
     }
 
+    public void acumulacionDeSobregiro(double monto){
+        this.acumuladorDeSobregiro += monto;
+    }
     public double getLimiteSobregiro() {
         return limiteSobregiro;
     }
 
     @Override
-    public void depositar(double monto) {
-        setSaldo(monto);
-        JOptionPane.showMessageDialog(null, "Deposito exitoso");
+    public double getMontoLimitePorOperacion() {
+        return montoLimitePorOperacion;
     }
 
     @Override
-    public void retirar(double monto) {
-        double saldoAuxiliar = getSaldo() - monto;
-        if (saldoAuxiliar < 0) {
-            if (saldoAuxiliar > limiteSobregiro) {
-                setSaldo(-monto);
-                JOptionPane.showMessageDialog(null, "Retiro exitoso");
-                return;
-            } 
-            JOptionPane.showMessageDialog(null, "Esta cuenta ha llegado a su límite de sobregiro");
-        }
-    }
-
-    @Override
-    public void consultar() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public void transferir(double montoEmisor, double montoReceptor) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
+    protected final void convertirCamposEspecificos(Moneda nuevaMoneda) {
+        limiteSobregiro = nuevaMoneda == Moneda.DOLAR ? 200 : 500;
+        montoLimitePorOperacion = nuevaMoneda == Moneda.DOLAR ? 25000 : 50000;
+    } 
 }

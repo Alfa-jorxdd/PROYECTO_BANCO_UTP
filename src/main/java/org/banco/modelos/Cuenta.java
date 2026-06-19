@@ -13,6 +13,8 @@ public abstract class Cuenta {
     private EstadoCuenta estadoCuenta;
     private Moneda tipoMoneda;
     private final TipoCuenta tipoCuenta;
+    
+    public abstract double getMontoLimitePorOperacion();
 
     public Cuenta(Moneda tipoMoneda, EstadoCuenta estadoCuenta, TipoCuenta tipoCuenta) {
         crearDigitosCuenta();
@@ -28,21 +30,13 @@ public abstract class Cuenta {
     private void crearDigitosCuenta() {
         Random digito = new Random();
         StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < 10; i++) {
-            sb.append(digito.nextInt(9));
+        sb.append(digito.nextInt(8) + 1);
+        for (int i = 1; i < 10; i++) {
+            sb.append(digito.nextInt(10));
         }
 
         numeroCuenta = Long.parseLong(sb.toString());
     }
-    public abstract void depositar(double monto);
-    
-    public abstract void retirar(double monto);
-    
-    public abstract void consultar();
-    
-    public abstract void transferir(double montoEmisor, double montoReceptor);
-
     public Moneda getTipoMoneda() {
         return tipoMoneda;
     }
@@ -52,7 +46,7 @@ public abstract class Cuenta {
     }
 
     public void modificarEstado(EstadoCuenta estado){
-        this.estadoCuenta = estadoCuenta;
+        this.estadoCuenta = estado;
     }
     
     public EstadoCuenta getEstadoCuenta(){
@@ -83,7 +77,22 @@ public abstract class Cuenta {
         this.estadoCuenta = estadoCuenta;
     }
 
-    public void setTipoMoneda(Moneda tipoMoneda) {
-        this.tipoMoneda = tipoMoneda;
+    public void setTipoMoneda(Moneda nuevaMoneda) {
+        if (this.tipoMoneda == nuevaMoneda) return;
+        double tipoDeCambio = Moneda.DOLAR.getTipoCambio();
+        
+        if (this.tipoMoneda == Moneda.SOL && nuevaMoneda == Moneda.DOLAR){
+            this.saldo /= tipoDeCambio;
+        } else {
+            this.saldo *= tipoDeCambio;
+        }
+       
+        this.tipoMoneda = nuevaMoneda;
+        
+        convertirCamposEspecificos(nuevaMoneda);
+    }
+    
+    protected void convertirCamposEspecificos(Moneda nuevaMoneda) {
+        
     }
 }

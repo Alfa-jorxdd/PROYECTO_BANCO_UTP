@@ -4,9 +4,8 @@ import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.banco.mantenimiento.MantenimientoOperacion;
+import org.banco.logica.mantenimiento.MantenimientoOperacion;
 import org.banco.modelos.Banco;
-import org.banco.modelos.Cliente;
 import org.banco.enums.Moneda;
 
 public class Operacion_DepositoPanel extends javax.swing.JPanel {
@@ -17,27 +16,32 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
     private DefaultListModel<String> modeloListaDNI = new DefaultListModel<>();
     private DefaultListModel<String> modeloResultadosDNI = new DefaultListModel<>();
 
+    private MantenimientoOperacion mo;
+
     public Operacion_DepositoPanel(Banco banco) {
         initComponents();
         InitStyles();
 
         this.banco = banco;
+        this.mo = new MantenimientoOperacion(banco);
 
         listNumeroCuenta.setModel(modeloResultadosCuenta);
         listDNI.setModel(modeloResultadosDNI);
 
-        cargarModeloListaCuenta();
-        cargarModeloListaDNI();
+        mo.cargarModelosConClientes(modeloListaCuenta);
+        mo.cargarModelosConClientes(modeloListaDNI);
 
         txtNumeroCuenta.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                filtrarModelCuenta();
+                mo.filtrarModelCuenta(txtNumeroCuenta.getText(), modeloResultadosCuenta);
+                mo.ponerTipoDeCuentaSiExiste(txtNumeroCuenta.getText(), labelTipoCuenta);
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                filtrarModelCuenta();
+                mo.filtrarModelCuenta(txtNumeroCuenta.getText(), modeloResultadosCuenta);
+                mo.ponerTipoDeCuentaSiExiste(txtNumeroCuenta.getText(), labelTipoCuenta);
             }
 
             @Override
@@ -49,12 +53,12 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
         txtDNI.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                filtrarModelDNI();
+                mo.filtrarModelDNI(txtDNI.getText(), modeloResultadosDNI);
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                filtrarModelDNI();
+                mo.filtrarModelDNI(txtDNI.getText(), modeloResultadosDNI);
             }
 
             @Override
@@ -62,68 +66,44 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
 
             }
         });
-        
+
     }
-
-    private void filtrarModelCuenta() {
-        String numeroBuscado = txtNumeroCuenta.getText().trim();
-        modeloResultadosCuenta.clear();
-
-        if (numeroBuscado.isEmpty() || !numeroBuscado.matches("[0-9]+")) {
-            return;
-        }
-
-        for (int i = 0; i < banco.getCuentas().length - 1; i++) {
-            String cuentaTxt = String.valueOf(banco.getCuentas()[i].getNumeroCuenta());
-            
-            if (cuentaTxt.contains(numeroBuscado)) {
-                Cliente[] titulares = banco.buscarClientesPorIdCuenta(banco.getCuentas()[i].getIdCuenta());
-                for (int j = 0; j < titulares.length; j++) {
-                    String primerNombre = titulares[j].getNombres().split(" ")[0];
-                    String primerApellido = titulares[j].getApellidos().split(" ")[0];
-                    modeloResultadosCuenta.addElement(primerNombre + " " + primerApellido + " - " + banco.getCuentas()[i].getNumeroCuenta());
-                }
-            }
-        }
-    }
-    
-    private void filtrarModelDNI() {
-        String dniBuscado = txtDNI.getText().trim();
-        modeloResultadosDNI.clear();
-
-        if (dniBuscado.isEmpty() || !dniBuscado.matches("[0-9]+")) {
-            return;
-        }
-
-        for (int i = 0; i < banco.getClientes().length - 1; i++) {
-            String dniTxt = String.valueOf(banco.getClientes()[i].getDni());
-            String primerNombre = banco.getClientes()[i].getNombres().split(" ")[0];
-            String primerApellido = banco.getClientes()[i].getApellidos().split(" ")[0];
-            
-            if (dniTxt.contains(dniBuscado)) {
-                modeloResultadosDNI.addElement(primerNombre + " " + primerApellido + " - " + dniTxt);
-            }
-        }
-    }
-
-    private void cargarModeloListaCuenta() {
-        modeloListaCuenta.removeAllElements();
-        for (int i = 0; i < banco.getClientes().length - 1; i++) {
-            Cliente c = banco.getClientes()[i];
-            modeloListaCuenta.addElement(c.getNombres() + " " + c.getApellidos());
-        }
-    }
-
-    private void cargarModeloListaDNI() {
-        modeloListaDNI.removeAllElements();
-        for (int i = 0; i < banco.getClientes().length - 1; i++) {
-            Cliente c = banco.getClientes()[i];
-            modeloListaDNI.addElement(c.getNombres() + " " + c.getApellidos());
-        }
-    }
-
     private void InitStyles() {
         labelDeposito.putClientProperty("FlatLaf.styleClass", "h0");
+    }
+
+    private boolean formulariosLlenos() {
+        boolean hayFormulariosVacios = txtNumeroCuenta.getText().trim().isEmpty()
+                || txtDNI.getText().trim().isEmpty()
+                || txtMonto.getText().trim().isEmpty()
+                || boxTipoMoneda.getSelectedIndex() == 0;
+        if (hayFormulariosVacios) {
+            JOptionPane.showMessageDialog(null, "Todos los campos deben estar llenos", "Error", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean formulariosValidos() {
+        if (!txtNumeroCuenta.getText().matches("^[0-9]{10}$")
+                || !txtDNI.getText().matches("^[0-9]{8}$")) {
+            JOptionPane.showMessageDialog(null, "Números de cuenta o DNI inválidos", "Error", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+
+        if (!txtMonto.getText().trim().matches("^[0-9]+([.][0-9]{1,2})?$")
+                || Double.parseDouble(txtMonto.getText().trim()) <= 0) {
+            JOptionPane.showMessageDialog(null, "Monto inválido. Solo debe contener números positivos y máximo 2 dígitos decimales", "Error", JOptionPane.WARNING_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+
+    private void limpiarFormularios() {
+        txtNumeroCuenta.setText("");
+        txtDNI.setText("");
+        txtMonto.setText("");
+        boxTipoMoneda.setSelectedIndex(0);
     }
 
     @SuppressWarnings("unchecked")
@@ -138,10 +118,11 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
         btnDepositar = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         txtNumeroCuenta = new javax.swing.JTextField();
-        labelNumeroCuenta = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         listNumeroCuenta = new javax.swing.JList<>();
         txtMonto = new javax.swing.JTextField();
+        labelTipoCuenta = new javax.swing.JLabel();
+        labelNumeroCuenta = new javax.swing.JLabel();
         labelMonto = new javax.swing.JLabel();
         jPanel4 = new javax.swing.JPanel();
         labelDNI = new javax.swing.JLabel();
@@ -214,9 +195,6 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         jPanel3.add(txtNumeroCuenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 220, 30));
 
-        labelNumeroCuenta.setText("Número de cuenta:");
-        jPanel3.add(labelNumeroCuenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 194, 24));
-
         listNumeroCuenta.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
                 listNumeroCuentaValueChanged(evt);
@@ -226,6 +204,10 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
 
         jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, 220, 37));
         jPanel3.add(txtMonto, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 172, 220, 30));
+        jPanel3.add(labelTipoCuenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 22, 110, 20));
+
+        labelNumeroCuenta.setText("Número de cuenta:");
+        jPanel3.add(labelNumeroCuenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 194, 24));
 
         labelMonto.setText("Monto");
         jPanel3.add(labelMonto, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 150, 70, -1));
@@ -283,10 +265,8 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
         getAccessibleContext().setAccessibleName("");
     }// </editor-fold>//GEN-END:initComponents
 
-    
     //======================EVENTOS==========================
-    
-    private void listNumeroCuentaValueChanged(javax.swing.event.ListSelectionEvent evt) {                                              
+    private void listNumeroCuentaValueChanged(javax.swing.event.ListSelectionEvent evt) {
         if (!evt.getValueIsAdjusting()) {
             String seleccionLista = listNumeroCuenta.getSelectedValue();
             if (seleccionLista != null) {
@@ -296,7 +276,7 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
         }
     }
 
-    private void listDNIValueChanged(javax.swing.event.ListSelectionEvent evt) {                                     
+    private void listDNIValueChanged(javax.swing.event.ListSelectionEvent evt) {
         if (!evt.getValueIsAdjusting()) {
             String seleccionLista = listDNI.getSelectedValue();
             if (seleccionLista != null) {
@@ -306,39 +286,22 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
         }
     }
 
-    private void btnDepositarActionPerformed(java.awt.event.ActionEvent evt) {                                             
-        if (txtNumeroCuenta.getText().trim().isEmpty() 
-                || txtDNI.getText().trim().isEmpty() 
-                || txtMonto.getText().trim().isEmpty()
-                || boxTipoMoneda.getSelectedIndex() == 0 ) {
-                
-            JOptionPane.showMessageDialog(null, "Todos los campos deben estar llenos", "Error", JOptionPane.WARNING_MESSAGE);
+    private void btnDepositarActionPerformed(java.awt.event.ActionEvent evt) {
+        if (!formulariosLlenos()) {
             return;
         }
-        if (!txtNumeroCuenta.getText().matches("^[0-9]{10}$") 
-                || !txtDNI.getText().matches("^[0-9]{8}$")) {
-            JOptionPane.showMessageDialog(null, "Números de cuenta o DNI inválidos", "Error", JOptionPane.WARNING_MESSAGE);
+        if (!formulariosValidos()) {
             return;
         }
-        
-        if (!txtMonto.getText().trim().matches("^[0-9]+([.][0-9]{1,2})?$") 
-                || Double.parseDouble(txtMonto.getText().trim()) <= 0) {
-            JOptionPane.showMessageDialog(null, "Monto inválido. Solo debe contener números positivos y máximo 2 dígitos decimales", "Error", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        MantenimientoOperacion mo = new MantenimientoOperacion(banco);
-        
+
         long numeroCuenta = Long.parseLong(txtNumeroCuenta.getText().trim());
         double monto = Double.parseDouble(txtMonto.getText().trim());
         int DNI = Integer.parseInt(txtDNI.getText().trim());
         Moneda monedaOperacion = Moneda.values()[boxTipoMoneda.getSelectedIndex() - 1];
-        
-        mo.depositar(numeroCuenta, monto, monedaOperacion);
-        
-        txtNumeroCuenta.setText("");
-        txtDNI.setText("");
-        txtMonto.setText("");
-        boxTipoMoneda.setSelectedIndex(0);
+
+        mo.depositar(numeroCuenta, monto, monedaOperacion, DNI);
+
+        limpiarFormularios();
     }
 
 
@@ -357,6 +320,7 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
     private javax.swing.JLabel labelMoneda;
     private javax.swing.JLabel labelMonto;
     private javax.swing.JLabel labelNumeroCuenta;
+    private javax.swing.JLabel labelTipoCuenta;
     private javax.swing.JList<String> listDNI;
     private javax.swing.JList<String> listNumeroCuenta;
     private javax.swing.JPanel panelTitulos;

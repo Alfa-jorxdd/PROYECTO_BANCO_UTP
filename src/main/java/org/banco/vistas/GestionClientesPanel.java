@@ -5,13 +5,12 @@ import javax.swing.JTable;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
-import org.banco.mantenimiento.MantenimientoCliente;
+import org.banco.logica.mantenimiento.MantenimientoCliente;
 import org.banco.modelos.Banco;
 
 public final class GestionClientesPanel extends javax.swing.JPanel {
 
     private final DefaultTableModel dtm;
-    private final Object[] obj = new Object[6];
     private final Banco banco;
     private final MantenimientoCliente mc;
     private boolean ascendente = true;
@@ -325,6 +324,8 @@ public final class GestionClientesPanel extends javax.swing.JPanel {
             txtDNI.setText(dtm.getValueAt(tClientes.getSelectedRow(), 3).toString());
             txtTelefono.setText(dtm.getValueAt(tClientes.getSelectedRow(), 4).toString());
             txtCorreo.setText(dtm.getValueAt(tClientes.getSelectedRow(), 5).toString());
+            
+            btnAgregar_Actualizar.setText("Actualizar");
         }
     }//GEN-LAST:event_tClientesMouseClicked
 

@@ -1,8 +1,9 @@
-package org.banco.mantenimiento;
+package org.banco.logica.mantenimiento;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import org.banco.modelos.*;
 
@@ -136,13 +137,13 @@ public class MantenimientoCuenta implements Gestionable {
             Cliente[] titulares = banco.buscarClientesPorIdCuenta(idCuenta);
 
             List<Object[]> filas = new ArrayList<>();
-            for (int j = 0; j < titulares.length; j++) {
+            for (Cliente titulare : titulares) {
                 Object[] cuentaDeFila = new Object[7];
                 cuentaDeFila[0] = idCuenta;
                 cuentaDeFila[1] = banco.getCuentas()[i].getTipoCuenta();
                 cuentaDeFila[2] = banco.getCuentas()[i].getEstadoCuenta();
                 cuentaDeFila[3] = banco.getCuentas()[i].getNumeroCuenta();
-                cuentaDeFila[4] = titulares[j].getNombres() + " " + titulares[j].getApellidos();
+                cuentaDeFila[4] = titulare.getNombres() + " " + titulare.getApellidos();
                 cuentaDeFila[5] = banco.getCuentas()[i].getSaldo();
                 cuentaDeFila[6] = banco.getCuentas()[i].getMoneda();
                 filas.add(cuentaDeFila);
@@ -150,6 +151,16 @@ public class MantenimientoCuenta implements Gestionable {
             bloque.add(filas);
         }
         return bloque;
+    }
+    
+    public DefaultListModel<String> cargarModeloLista() {
+        DefaultListModel<String> modeloLista = new DefaultListModel<>();
+        modeloLista.removeAllElements();
+        for (int i = 0; i < banco.getClientes().length - 1; i++) {
+            Cliente c = banco.getClientes()[i];
+            modeloLista.addElement(c.getNombres() + " " + c.getApellidos());
+        }
+        return modeloLista;
     }
 
     public void setDatosCuenta(TipoCuenta tipoCuenta, EstadoCuenta estadoCuenta, Moneda tipoMoneda) {

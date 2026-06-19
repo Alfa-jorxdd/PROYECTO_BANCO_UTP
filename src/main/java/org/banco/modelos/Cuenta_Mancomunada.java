@@ -5,28 +5,20 @@ import org.banco.enums.Moneda;
 import org.banco.enums.TipoCuenta;
 
 public class Cuenta_Mancomunada extends Cuenta {
+    private double montoLimitePorOperacion;
 
     public Cuenta_Mancomunada(Moneda tipoMoneda, EstadoCuenta estadoCuenta) {
         super(tipoMoneda, estadoCuenta, TipoCuenta.MANCOMUNADA);
+        convertirCamposEspecificos(tipoMoneda);
     }
 
     @Override
-    public void depositar(double monto) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public double getMontoLimitePorOperacion() {
+        return montoLimitePorOperacion;
     }
 
     @Override
-    public void retirar(double monto) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public void consultar() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
-    @Override
-    public void transferir(double montoEmisor, double montoReceptor) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    protected final void convertirCamposEspecificos(Moneda nuevaMoneda) {
+        montoLimitePorOperacion = nuevaMoneda == Moneda.DOLAR ? 50000 : 100000;
     }
 }

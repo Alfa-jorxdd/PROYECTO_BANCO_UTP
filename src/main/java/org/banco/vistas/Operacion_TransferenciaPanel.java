@@ -8,40 +8,38 @@ import org.banco.logica.mantenimiento.MantenimientoOperacion;
 import org.banco.modelos.Banco;
 import org.banco.enums.Moneda;
 
-public class Operacion_RetiroPanel extends javax.swing.JPanel {
+public class Operacion_TransferenciaPanel extends javax.swing.JPanel {
 
     private Banco banco;
     private DefaultListModel<String> modeloListaCuenta = new DefaultListModel<>();
-    private DefaultListModel<String> modeloResultadosCuenta = new DefaultListModel<>();
-    private DefaultListModel<String> modeloListaDNI = new DefaultListModel<>();
-    private DefaultListModel<String> modeloResultadosDNI = new DefaultListModel<>();
+    private DefaultListModel<String> modeloResultadosCuentaOri = new DefaultListModel<>();
+    private DefaultListModel<String> modeloResultadosCuentaDest = new DefaultListModel<>();
     
     private MantenimientoOperacion mo;
 
-    public Operacion_RetiroPanel(Banco banco) {
+    public Operacion_TransferenciaPanel(Banco banco) {
         initComponents();
         InitStyles();
 
         this.banco = banco;
         mo = new MantenimientoOperacion(banco);
 
-        listNumeroCuenta.setModel(modeloResultadosCuenta);
-        listDNI.setModel(modeloResultadosDNI);
+        listNumCuentaOrigen.setModel(modeloResultadosCuentaOri);
+        listNumCuentaDestino.setModel(modeloResultadosCuentaDest);
 
         mo.cargarModelosConClientes(modeloListaCuenta);
-        mo.cargarModelosConClientes(modeloListaDNI);
 
-        txtNumeroCuenta.getDocument().addDocumentListener(new DocumentListener() {
+        txtNumCuentaOrigen.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                mo.filtrarModelCuenta(txtNumeroCuenta.getText(), modeloResultadosCuenta);
-                mo.ponerTipoDeCuentaSiExiste(txtNumeroCuenta.getText(), labelTipoCuenta);
+                mo.filtrarModelCuenta(txtNumCuentaOrigen.getText(), modeloResultadosCuentaOri);
+                mo.ponerTipoDeCuentaSiExiste(txtNumCuentaOrigen.getText().trim(), labelTipoCuenta1);
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                mo.filtrarModelCuenta(txtNumeroCuenta.getText(), modeloResultadosCuenta);
-                mo.ponerTipoDeCuentaSiExiste(txtNumeroCuenta.getText(), labelTipoCuenta);
+                mo.filtrarModelCuenta(txtNumCuentaOrigen.getText(), modeloResultadosCuentaOri);
+                mo.ponerTipoDeCuentaSiExiste(txtNumCuentaOrigen.getText().trim(), labelTipoCuenta1);
             }
 
             @Override
@@ -50,15 +48,17 @@ public class Operacion_RetiroPanel extends javax.swing.JPanel {
             }
         });
 
-        txtDNI.getDocument().addDocumentListener(new DocumentListener() {
+        txtNumCuentaDestino.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                mo.filtrarModelDNI(txtDNI.getText(), modeloResultadosDNI);
+                mo.filtrarModelCuenta(txtNumCuentaDestino.getText(), modeloResultadosCuentaDest);
+                mo.ponerTipoDeCuentaSiExiste(txtNumCuentaDestino.getText().trim(), labelTipoCuenta2);
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                mo.filtrarModelDNI(txtDNI.getText(), modeloResultadosDNI);
+                mo.filtrarModelCuenta(txtNumCuentaDestino.getText(), modeloResultadosCuentaDest);
+                mo.ponerTipoDeCuentaSiExiste(txtNumCuentaDestino.getText().trim(), labelTipoCuenta2);
             }
 
             @Override
@@ -66,6 +66,7 @@ public class Operacion_RetiroPanel extends javax.swing.JPanel {
 
             }
         });
+        
     }
     
     private void InitStyles() {
@@ -73,9 +74,10 @@ public class Operacion_RetiroPanel extends javax.swing.JPanel {
     }
     
     private boolean formulariosLlenos(){
-        boolean hayFormulariosVacios = txtNumeroCuenta.getText().trim().isEmpty() 
-                || txtDNI.getText().trim().isEmpty() 
-                || txtMonto.getText().trim().isEmpty()
+        boolean hayFormulariosVacios = txtNumCuentaOrigen.getText().trim().isEmpty() 
+                || txtNumCuentaDestino.getText().trim().isEmpty() 
+                || txtMonto.getText().trim().isEmpty() 
+                || txtDNI.getText().trim().isEmpty()
                 || boxTipoMoneda.getSelectedIndex() == 0;
         if (hayFormulariosVacios) {
             JOptionPane.showMessageDialog(null, "Todos los campos deben estar llenos", "Error", JOptionPane.WARNING_MESSAGE);
@@ -85,9 +87,9 @@ public class Operacion_RetiroPanel extends javax.swing.JPanel {
     }
     
     private boolean formulariosValidos(){
-        if (!txtNumeroCuenta.getText().matches("^[0-9]{10}$") 
-                || !txtDNI.getText().matches("^[0-9]{8}$")) {
-            JOptionPane.showMessageDialog(null, "Números de cuenta o DNI inválidos", "Error", JOptionPane.WARNING_MESSAGE);
+        if (!txtNumCuentaOrigen.getText().matches("^[0-9]{10}$") 
+                || !txtNumCuentaDestino.getText().matches("^[0-9]{10}$")) {
+            JOptionPane.showMessageDialog(null, "Números de cuenta inválidos", "Error", JOptionPane.WARNING_MESSAGE);
             return false;
         }
         
@@ -96,11 +98,16 @@ public class Operacion_RetiroPanel extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(null, "Monto inválido. Solo debe contener números positivos y máximo 2 dígitos decimales", "Error", JOptionPane.WARNING_MESSAGE);
             return false;
         }
+        if (!txtDNI.getText().trim().matches("^[0-9]{8}$")) {
+            JOptionPane.showMessageDialog(null, "DNI inválido");
+            return false;
+        }
         return true;
     }
     
     private void limpiarFormularios(){
-        txtNumeroCuenta.setText("");
+        txtNumCuentaOrigen.setText("");
+        txtNumCuentaDestino.setText("");
         txtDNI.setText("");
         txtMonto.setText("");
         boxTipoMoneda.setSelectedIndex(0);
@@ -117,29 +124,32 @@ public class Operacion_RetiroPanel extends javax.swing.JPanel {
         jPanel1 = new javax.swing.JPanel();
         btnRetirar = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
-        txtNumeroCuenta = new javax.swing.JTextField();
+        txtNumCuentaOrigen = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
-        listNumeroCuenta = new javax.swing.JList<>();
-        txtMonto = new javax.swing.JTextField();
-        labelMonto = new javax.swing.JLabel();
-        labelTipoCuenta = new javax.swing.JLabel();
-        labelNumeroCuenta = new javax.swing.JLabel();
-        jPanel4 = new javax.swing.JPanel();
-        labelDNI = new javax.swing.JLabel();
+        listNumCuentaOrigen = new javax.swing.JList<>();
         txtDNI = new javax.swing.JTextField();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        listDNI = new javax.swing.JList<>();
+        jLabel1 = new javax.swing.JLabel();
         boxTipoMoneda = new javax.swing.JComboBox<>();
         labelMoneda = new javax.swing.JLabel();
+        labelTipoCuenta1 = new javax.swing.JLabel();
+        labelNumCuentaOrigen = new javax.swing.JLabel();
+        jPanel4 = new javax.swing.JPanel();
+        labelNumCuentaDestino = new javax.swing.JLabel();
+        txtNumCuentaDestino = new javax.swing.JTextField();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        listNumCuentaDestino = new javax.swing.JList<>();
+        txtMonto = new javax.swing.JTextField();
+        labelMonto = new javax.swing.JLabel();
+        labelTipoCuenta2 = new javax.swing.JLabel();
 
         setMinimumSize(new java.awt.Dimension(518, 396));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         bg.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        labelDeposito.setText("Retiro");
+        labelDeposito.setText("Transferencia");
 
-        jLabel4.setText("Retira fondos de una cuenta Bancaria");
+        jLabel4.setText("Transfiere fondos de una cuenta a otra");
 
         javax.swing.GroupLayout panelTitulosLayout = new javax.swing.GroupLayout(panelTitulos);
         panelTitulos.setLayout(panelTitulosLayout);
@@ -164,7 +174,7 @@ public class Operacion_RetiroPanel extends javax.swing.JPanel {
 
         bg.add(panelTitulos, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
-        btnRetirar.setText("Confirmar retiro");
+        btnRetirar.setText("Confirmar transferencia");
         btnRetirar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnRetirarActionPerformed(evt);
@@ -193,39 +203,43 @@ public class Operacion_RetiroPanel extends javax.swing.JPanel {
         jPanel3.setAlignmentX(0.01F);
         jPanel3.setAlignmentY(0.01F);
         jPanel3.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        jPanel3.add(txtNumeroCuenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 50, 220, 30));
+        jPanel3.add(txtNumCuentaOrigen, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 30, 220, 30));
 
-        listNumeroCuenta.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+        listNumCuentaOrigen.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                listNumeroCuentaValueChanged(evt);
+                listNumCuentaOrigenValueChanged(evt);
             }
         });
-        jScrollPane1.setViewportView(listNumeroCuenta);
+        jScrollPane1.setViewportView(listNumCuentaOrigen);
 
-        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 90, 220, 37));
-        jPanel3.add(txtMonto, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 172, 220, 30));
+        jPanel3.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 70, 220, 37));
+        jPanel3.add(txtDNI, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 190, 207, 32));
 
-        labelMonto.setText("Monto");
-        jPanel3.add(labelMonto, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 150, 70, -1));
-        jPanel3.add(labelTipoCuenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 22, 110, 20));
+        jLabel1.setText("DNI:");
+        jPanel3.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 170, -1, -1));
 
-        labelNumeroCuenta.setText("Número de cuenta:");
-        jPanel3.add(labelNumeroCuenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 194, 24));
+        boxTipoMoneda.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "NINGUNA", "SOL", "DOLAR" }));
+        jPanel3.add(boxTipoMoneda, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 140, 113, -1));
+
+        labelMoneda.setText("Moneda:");
+        jPanel3.add(labelMoneda, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 120, 90, -1));
+        jPanel3.add(labelTipoCuenta1, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 2, 120, 20));
+
+        labelNumCuentaOrigen.setText("Cuenta: (Origen)");
+        jPanel3.add(labelNumCuentaOrigen, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 0, 194, 24));
 
         bg.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 253, 230));
 
-        labelDNI.setText("DNI:");
+        labelNumCuentaDestino.setText("Cuenta: (Destino)");
 
-        listDNI.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
+        listNumCuentaDestino.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
             public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                listDNIValueChanged(evt);
+                listNumCuentaDestinoValueChanged(evt);
             }
         });
-        jScrollPane2.setViewportView(listDNI);
+        jScrollPane2.setViewportView(listNumCuentaDestino);
 
-        boxTipoMoneda.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "NINGUNA", "SOL", "DOLAR" }));
-
-        labelMoneda.setText("Moneda:");
+        labelMonto.setText("Monto");
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -234,28 +248,33 @@ public class Operacion_RetiroPanel extends javax.swing.JPanel {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addGap(19, 19, 19)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(labelMonto, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addComponent(txtDNI, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
-                        .addComponent(labelDNI)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                    .addComponent(labelMoneda, javax.swing.GroupLayout.PREFERRED_SIZE, 90, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(boxTipoMoneda, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(txtNumCuentaDestino, javax.swing.GroupLayout.DEFAULT_SIZE, 207, Short.MAX_VALUE)
+                        .addGroup(jPanel4Layout.createSequentialGroup()
+                            .addComponent(labelNumCuentaDestino)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                            .addComponent(labelTipoCuenta2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                        .addComponent(txtMonto)))
                 .addContainerGap(24, Short.MAX_VALUE))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGap(28, 28, 28)
-                .addComponent(labelDNI)
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(labelNumCuentaDestino, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(labelTipoCuenta2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(txtDNI, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(txtNumCuentaDestino, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
-                .addComponent(labelMoneda)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 63, Short.MAX_VALUE)
+                .addComponent(labelMonto)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(boxTipoMoneda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(37, 37, 37))
+                .addComponent(txtMonto, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(9, 9, 9))
         );
 
         bg.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(259, 90, 250, 230));
@@ -268,22 +287,22 @@ public class Operacion_RetiroPanel extends javax.swing.JPanel {
     
     //======================EVENTOS==========================
     
-    private void listNumeroCuentaValueChanged(javax.swing.event.ListSelectionEvent evt) {                                              
+    private void listNumCuentaOrigenValueChanged(javax.swing.event.ListSelectionEvent evt) {                                              
         if (!evt.getValueIsAdjusting()) {
-            String seleccionLista = listNumeroCuenta.getSelectedValue();
+            String seleccionLista = listNumCuentaOrigen.getSelectedValue();
             if (seleccionLista != null) {
                 String cuentaSeleccionada = seleccionLista.split(" - ")[1];
-                txtNumeroCuenta.setText(cuentaSeleccionada);
+                txtNumCuentaOrigen.setText(cuentaSeleccionada);
             }
         }
     }
 
-    private void listDNIValueChanged(javax.swing.event.ListSelectionEvent evt) {                                     
+    private void listNumCuentaDestinoValueChanged(javax.swing.event.ListSelectionEvent evt) {                                     
         if (!evt.getValueIsAdjusting()) {
-            String seleccionLista = listDNI.getSelectedValue();
+            String seleccionLista = listNumCuentaDestino.getSelectedValue();
             if (seleccionLista != null) {
-                String dniSeleccionado = seleccionLista.split(" - ")[1];
-                txtDNI.setText(dniSeleccionado);
+                String cuentaSeleccionado = seleccionLista.split(" - ")[1];
+                txtNumCuentaDestino.setText(cuentaSeleccionado);
             }
         }
     }
@@ -292,12 +311,15 @@ public class Operacion_RetiroPanel extends javax.swing.JPanel {
         if (!formulariosLlenos()) return;
         if (!formulariosValidos()) return;
         
-        long numeroCuenta = Long.parseLong(txtNumeroCuenta.getText().trim());
-        double monto = Double.parseDouble(txtMonto.getText().trim());
-        int DNI = Integer.parseInt(txtDNI.getText().trim());
-        Moneda monedaOperacion = Moneda.values()[boxTipoMoneda.getSelectedIndex() - 1];
         
-        mo.retirar(numeroCuenta, monto, monedaOperacion, DNI);
+        
+        long numCuentaOrigen = Long.parseLong(txtNumCuentaOrigen.getText().trim());
+        double monto = Double.parseDouble(txtMonto.getText().trim());
+        long numCuentaDestino = Long.parseLong(txtNumCuentaDestino.getText().trim());
+        Moneda monedaOperacion = Moneda.values()[boxTipoMoneda.getSelectedIndex() - 1];
+        int DNI = Integer.parseInt(txtDNI.getText().trim());
+        
+        mo.transferir(numCuentaOrigen, numCuentaDestino, monto, monedaOperacion, DNI);
         
         limpiarFormularios();
     }
@@ -307,23 +329,26 @@ public class Operacion_RetiroPanel extends javax.swing.JPanel {
     private javax.swing.JPanel bg;
     private javax.swing.JComboBox<String> boxTipoMoneda;
     private javax.swing.JButton btnRetirar;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JLabel labelDNI;
     private javax.swing.JLabel labelDeposito;
     private javax.swing.JLabel labelMoneda;
     private javax.swing.JLabel labelMonto;
-    private javax.swing.JLabel labelNumeroCuenta;
-    private javax.swing.JLabel labelTipoCuenta;
-    private javax.swing.JList<String> listDNI;
-    private javax.swing.JList<String> listNumeroCuenta;
+    private javax.swing.JLabel labelNumCuentaDestino;
+    private javax.swing.JLabel labelNumCuentaOrigen;
+    private javax.swing.JLabel labelTipoCuenta1;
+    private javax.swing.JLabel labelTipoCuenta2;
+    private javax.swing.JList<String> listNumCuentaDestino;
+    private javax.swing.JList<String> listNumCuentaOrigen;
     private javax.swing.JPanel panelTitulos;
     private javax.swing.JTextField txtDNI;
     private javax.swing.JTextField txtMonto;
-    private javax.swing.JTextField txtNumeroCuenta;
+    private javax.swing.JTextField txtNumCuentaDestino;
+    private javax.swing.JTextField txtNumCuentaOrigen;
     // End of variables declaration//GEN-END:variables
 }
