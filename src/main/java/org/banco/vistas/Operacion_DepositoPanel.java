@@ -10,26 +10,19 @@ import org.banco.enums.Moneda;
 
 public class Operacion_DepositoPanel extends javax.swing.JPanel {
 
-    private Banco banco;
-    private DefaultListModel<String> modeloListaCuenta = new DefaultListModel<>();
-    private DefaultListModel<String> modeloResultadosCuenta = new DefaultListModel<>();
-    private DefaultListModel<String> modeloListaDNI = new DefaultListModel<>();
-    private DefaultListModel<String> modeloResultadosDNI = new DefaultListModel<>();
+    private final DefaultListModel<String> modeloResultadosCuenta = new DefaultListModel<>();
+    private final DefaultListModel<String> modeloResultadosDNI = new DefaultListModel<>();
 
-    private MantenimientoOperacion mo;
+    private final MantenimientoOperacion mo;
 
-    public Operacion_DepositoPanel(Banco banco) {
+    public Operacion_DepositoPanel() {
         initComponents();
         InitStyles();
 
-        this.banco = banco;
-        this.mo = new MantenimientoOperacion(banco);
+        this.mo = new MantenimientoOperacion();
 
         listNumeroCuenta.setModel(modeloResultadosCuenta);
         listDNI.setModel(modeloResultadosDNI);
-
-        mo.cargarModelosConClientes(modeloListaCuenta);
-        mo.cargarModelosConClientes(modeloListaDNI);
 
         txtNumeroCuenta.getDocument().addDocumentListener(new DocumentListener() {
             @Override

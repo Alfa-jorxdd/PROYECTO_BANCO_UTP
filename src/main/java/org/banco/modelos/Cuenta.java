@@ -6,8 +6,7 @@ import org.banco.enums.Moneda;
 import org.banco.enums.TipoCuenta;
 
 public abstract class Cuenta {
-    private static int incrementarId = 0;
-    private final int idCuenta;
+    private int idCuenta;
     private double saldo;
     private long numeroCuenta;
     private EstadoCuenta estadoCuenta;
@@ -17,9 +16,9 @@ public abstract class Cuenta {
     public abstract double getMontoLimitePorOperacion();
 
     public Cuenta(Moneda tipoMoneda, EstadoCuenta estadoCuenta, TipoCuenta tipoCuenta) {
-        crearDigitosCuenta();
+        this.numeroCuenta = crearDigitosCuenta();
 
-        this.idCuenta = ++incrementarId;
+        this.idCuenta = 0;
         this.tipoMoneda = tipoMoneda;
         this.estadoCuenta = estadoCuenta; 
         this.tipoCuenta = tipoCuenta;
@@ -27,7 +26,17 @@ public abstract class Cuenta {
         saldo = 0;
     }
 
-    private void crearDigitosCuenta() {
+    public Cuenta(int idCuenta, TipoCuenta tipoCuenta, Moneda tipoMoneda, EstadoCuenta estadoCuenta, long numeroCuenta) {
+        this.idCuenta = idCuenta;
+        this.tipoCuenta = tipoCuenta;
+        this.tipoMoneda = tipoMoneda;
+        this.estadoCuenta = estadoCuenta;
+        this.numeroCuenta = numeroCuenta;
+
+        saldo = 0;
+    }
+
+    private Long crearDigitosCuenta() {
         Random digito = new Random();
         StringBuilder sb = new StringBuilder();
         sb.append(digito.nextInt(8) + 1);
@@ -35,7 +44,7 @@ public abstract class Cuenta {
             sb.append(digito.nextInt(10));
         }
 
-        numeroCuenta = Long.parseLong(sb.toString());
+        return Long.parseLong(sb.toString());
     }
     public Moneda getTipoMoneda() {
         return tipoMoneda;
@@ -60,6 +69,9 @@ public abstract class Cuenta {
     public int getIdCuenta() {
         return idCuenta;
     }
+    public void setIdCuenta(int idCuenta){
+        this.idCuenta = idCuenta;
+    }
     
     public double getSaldo() {
         return saldo;
@@ -69,8 +81,11 @@ public abstract class Cuenta {
         return tipoMoneda;
     }
     
-    public void setSaldo(double saldo) {
+    public void agregarSaldo(double saldo) {
         this.saldo = this.saldo + saldo;
+    }
+    public void setSaldo(double saldo){
+        this.saldo = saldo;
     }
 
     public void setEstadoCuenta(EstadoCuenta estadoCuenta) {
@@ -80,7 +95,8 @@ public abstract class Cuenta {
     public void setTipoMoneda(Moneda nuevaMoneda) {
         if (this.tipoMoneda == nuevaMoneda) return;
         double tipoDeCambio = Moneda.DOLAR.getTipoCambio();
-        
+
+        //El primer if se cambia de una moneda de SOL a una de DOLAR, por eso se divide
         if (this.tipoMoneda == Moneda.SOL && nuevaMoneda == Moneda.DOLAR){
             this.saldo /= tipoDeCambio;
         } else {
@@ -94,5 +110,9 @@ public abstract class Cuenta {
     
     protected void convertirCamposEspecificos(Moneda nuevaMoneda) {
         
+    }
+
+    public void cambiarNumeroCuenta(){
+        numeroCuenta = crearDigitosCuenta();
     }
 }

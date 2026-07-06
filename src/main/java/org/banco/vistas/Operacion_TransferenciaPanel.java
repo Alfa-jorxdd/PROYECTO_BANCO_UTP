@@ -10,24 +10,20 @@ import org.banco.enums.Moneda;
 
 public class Operacion_TransferenciaPanel extends javax.swing.JPanel {
 
-    private Banco banco;
-    private DefaultListModel<String> modeloListaCuenta = new DefaultListModel<>();
-    private DefaultListModel<String> modeloResultadosCuentaOri = new DefaultListModel<>();
-    private DefaultListModel<String> modeloResultadosCuentaDest = new DefaultListModel<>();
+    private final DefaultListModel<String> modeloResultadosCuentaOri = new DefaultListModel<>();
+    private final DefaultListModel<String> modeloResultadosCuentaDest = new DefaultListModel<>();
     
-    private MantenimientoOperacion mo;
+    private final MantenimientoOperacion mo;
 
-    public Operacion_TransferenciaPanel(Banco banco) {
+    public Operacion_TransferenciaPanel() {
         initComponents();
         InitStyles();
 
-        this.banco = banco;
-        mo = new MantenimientoOperacion(banco);
+        mo = new MantenimientoOperacion();
 
         listNumCuentaOrigen.setModel(modeloResultadosCuentaOri);
         listNumCuentaDestino.setModel(modeloResultadosCuentaDest);
 
-        mo.cargarModelosConClientes(modeloListaCuenta);
 
         txtNumCuentaOrigen.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -310,9 +306,7 @@ public class Operacion_TransferenciaPanel extends javax.swing.JPanel {
     private void btnRetirarActionPerformed(java.awt.event.ActionEvent evt) {                                             
         if (!formulariosLlenos()) return;
         if (!formulariosValidos()) return;
-        
-        
-        
+
         long numCuentaOrigen = Long.parseLong(txtNumCuentaOrigen.getText().trim());
         double monto = Double.parseDouble(txtMonto.getText().trim());
         long numCuentaDestino = Long.parseLong(txtNumCuentaDestino.getText().trim());

@@ -16,6 +16,12 @@ public class Cuenta_Corriente extends Cuenta{
         convertirCamposEspecificos(tipoMoneda);
     }
 
+    public Cuenta_Corriente(int idCuenta, Moneda tipoMoneda, EstadoCuenta estadoCuenta, long numeroCuenta) {
+        super(idCuenta, TipoCuenta.CORRIENTE, tipoMoneda, estadoCuenta, numeroCuenta);
+        acumuladorDeSobregiro = 0;
+        convertirCamposEspecificos(tipoMoneda);
+    }
+
     public void acumulacionDeSobregiro(double monto){
         this.acumuladorDeSobregiro += monto;
     }
@@ -30,7 +36,7 @@ public class Cuenta_Corriente extends Cuenta{
 
     @Override
     protected final void convertirCamposEspecificos(Moneda nuevaMoneda) {
-        limiteSobregiro = nuevaMoneda == Moneda.DOLAR ? 200 : 500;
+        limiteSobregiro = nuevaMoneda == Moneda.DOLAR ? -200 : -500;
         montoLimitePorOperacion = nuevaMoneda == Moneda.DOLAR ? 25000 : 50000;
     } 
 }

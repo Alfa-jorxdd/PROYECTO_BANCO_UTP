@@ -1,10 +1,11 @@
 package org.banco.logica.mantenimiento;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
+
+import org.banco.dao.ClienteDAO;
+import org.banco.dao.Cliente_CuentaDAO;
+import org.banco.dao.CuentaDAO;
 import org.banco.modelos.*;
 
 import javax.swing.table.DefaultTableModel;
@@ -13,154 +14,131 @@ import org.banco.enums.Moneda;
 import org.banco.enums.TipoCuenta;
 import org.banco.interfaces.Gestionable;
 
+import java.util.ArrayList;
+import java.util.List;
+import org.banco.enums.Formato;
+import org.banco.enums.TipoReporte;
+import org.banco.logica.ReporteExcel;
+import org.banco.logica.ReporteHtml;
+import org.banco.logica.ReportePdf;
+
 public class MantenimientoCuenta implements Gestionable {
 
-    private Banco banco;
+    private CuentaDAO cuentaDAO;
+    private ClienteDAO clienteDAO;
+    private Cliente_CuentaDAO cliente_cuentaDAO;
     private int[] idClientes;
     private int idCuenta;
     private TipoCuenta tipoCuenta;
     private EstadoCuenta estadoCuenta;
     private Moneda tipoMoneda;
 
-    public MantenimientoCuenta(Banco banco) {
-        this.banco = banco;
+    public MantenimientoCuenta() {
+        cuentaDAO = new CuentaDAO();
+        cliente_cuentaDAO = new Cliente_CuentaDAO();
+        clienteDAO = new ClienteDAO();
     }
 
     @Override
     public void agregar() {
+        Cuenta nuevaCue = null;
 
-        Cuenta nuevaCuenta = banco.agregarListaCuentas(tipoCuenta, tipoMoneda, estadoCuenta);
+        switch (tipoCuenta){
+            case AHORRO :
+                nuevaCue = new Cuenta_Ahorro(tipoMoneda, estadoCuenta);
+                break;
+            case CORRIENTE :
+                nuevaCue = new Cuenta_Corriente(tipoMoneda, estadoCuenta);
+                break;
+            case MANCOMUNADA :
+                nuevaCue = new Cuenta_Mancomunada(tipoMoneda, estadoCuenta);
+                break;
+        }
 
-        if (idClientes.length > 1) {
-            for (int i = 0; i < idClientes.length; i++) {
-                Cliente nuevoCliente = banco.buscarIdCliente(idClientes[i]);
-                banco.agregarListaCliente_Cuenta(nuevoCliente, nuevaCuenta);
-            }
-        } else {
-            Cliente nuevoCliente = banco.buscarIdCliente(idClientes[0]);
-            banco.agregarListaCliente_Cuenta(nuevoCliente, nuevaCuenta);
+        cuentaDAO.agregarCuenta(nuevaCue);
+        int idCuenta = nuevaCue.getIdCuenta();
+        System.out.println("MANTENIMIENTO");
+        System.out.println(idCuenta);
+        for (int idCliente : idClientes) {
+            cliente_cuentaDAO.agregarCliente_Cuenta(idCliente, idCuenta);
         }
         JOptionPane.showMessageDialog(null, "Cuenta agregada exitosamente");
     }
 
     @Override
     public void eliminar() {
-        banco.disminuirListaCliente_CuentaPorIdCuenta(idCuenta);
-        int indiceCuenta = banco.buscarIndiceCuenta(idCuenta);
-        banco.disminuirListaCuentas(indiceCuenta);
+        cliente_cuentaDAO.eliminarCliente_CuentaPorIdCuenta(idCuenta);
+        cuentaDAO.eliminarCuenta(idCuenta);
 
         JOptionPane.showMessageDialog(null, "Cuenta eliminada exitosamente");
     }
 
     @Override
     public void actualizar() {
-        int indiceCuenta = banco.buscarIndiceCuenta(idCuenta);
-        
-        banco.getCuentas()[indiceCuenta].setEstadoCuenta(estadoCuenta);
-        banco.getCuentas()[indiceCuenta].setTipoMoneda(tipoMoneda);
-        
-        banco.disminuirListaCliente_CuentaPorIdCuenta(idCuenta);
-        
-        Cuenta cuenta = banco.buscarCuentaPorId(idCuenta);
-        for (int i = 0; i < idClientes.length; i++) {
-            Cliente nuevoCliente = banco.buscarIdCliente(idClientes[i]);
-            banco.agregarListaCliente_Cuenta(nuevoCliente, cuenta);
+        Cuenta cuenta1 = cuentaDAO.buscarCuentaPorId(idCuenta);
+        cuenta1.setEstadoCuenta(estadoCuenta);
+        cuenta1.setTipoMoneda(tipoMoneda);
+        cuentaDAO.actualizarCuenta(cuenta1);
+
+        cliente_cuentaDAO.eliminarCliente_CuentaPorIdCuenta(idCuenta);
+
+        for (int idCliente : idClientes) {
+            cliente_cuentaDAO.agregarCliente_Cuenta(idCliente, idCuenta);
         }
-        JOptionPane.showMessageDialog(null, "Cuenta actualizada exitosamente");
     }
 
     @Override
     public void listar(DefaultTableModel dtm, boolean ascendete, int criterioOrden, int criterioFiltrado, String textoFiltrar) {
-        dtm.setRowCount(0);
-        
-        List<List<Object[]>> bloque = construirBloque();
-        
-        bloque = filtrar(criterioFiltrado, bloque, textoFiltrar);
-        
-        Comparator<List<Object[]>> comparador = null;
-        switch (criterioOrden) {
-            case 0 ://Ordenar por ID
-                comparador = (o1, o2) -> Integer.compare((int)o1.get(0)[0], (int)o2.get(0)[0]); break;
-            case 1 : //Ordenar por tipo de cuenta
-                comparador = (o1, o2) -> o1.get(0)[1].toString().compareTo(o2.get(0)[1].toString()); break;
-            case 2 : //Ordenar por estado de cuenta
-                comparador = (o1, o2) -> o1.get(0)[2].toString().compareTo(o2.get(0)[2].toString()); break;
-            case 3 : //Ordenar por numero de cuenta
-                comparador = (o1, o2) -> Long.compare((long)o1.get(0)[3], (long)o2.get(0)[3]); break;
-            case 4 : //Ordenar por saldo
-                comparador = (o1, o2) -> Double.compare((double)o1.get(0)[5], (double)o2.get(0)[5]); break;
-            case 5 : //Ordenar por Moneda
-                comparador = (o1, o2) -> o1.get(0)[6].toString().compareTo(o2.get(0)[6].toString()); break;
-        }
-        bloque.sort(ascendete ? comparador : comparador.reversed());
-        
-        
-        
-        dtm.setRowCount(0);
-        for (List<Object[]> filas : bloque) {
-            for (Object[] fila : filas) {
-                dtm.addRow(fila);
-            }
-        }
+        cuentaDAO.listarCuentas(dtm, ascendete, criterioOrden, criterioFiltrado, textoFiltrar);
     }
     
-    private List<List<Object[]>> filtrar(int criterioFiltrado, List<List<Object[]>> bloque, String textoFiltrar){
-        if (textoFiltrar.trim().isEmpty()) {
-            return bloque;
+    public void generarReporte(String nombre, Formato formato, boolean ascendete, int criterioOrden, int criterioFiltrado, String textoFiltrar){
+        Reporte nuevoReporte = null;
+        switch(formato){
+            case PDF :
+                nuevoReporte = new ReportePdf(nombre, TipoReporte.CUENTAS);
+                break;
+            case EXCEL :
+                nuevoReporte = new ReporteExcel(nombre, TipoReporte.CUENTAS);
+                break;
+            case HTML :
+                nuevoReporte = new ReporteHtml(nombre, TipoReporte.CUENTAS);
+                break;
         }
-        if (criterioFiltrado > 3) {
-            criterioFiltrado++;
-        }
-        
-        List<List<Object[]>> bloqueFiltrado = new ArrayList<>();
-        String texto = textoFiltrar.trim().toLowerCase();
-        
-        for (List<Object[]> filas : bloque) {
-            boolean concide = false;
-            for (Object[] fila : filas) {
-                if (fila[criterioFiltrado].toString().toLowerCase().contains(texto)) {
-                    concide = true;
-                    break;
-                }
-            }
-            if (concide) bloqueFiltrado.add(filas);
-        }
-        return bloqueFiltrado;
+        List<Object[]> lista = cuentaDAO.listarCuentas(ascendete, criterioOrden, criterioFiltrado, textoFiltrar);
+        nuevoReporte.crearReporte(lista);
     }
-    
-    
-    private List<List<Object[]>> construirBloque() {
-        List<List<Object[]>> bloque = new ArrayList<>();
 
-        for (int i = 0; i < banco.getCuentas().length - 1; i++) {
-            int idCuenta = banco.getCuentas()[i].getIdCuenta();
-            Cliente[] titulares = banco.buscarClientesPorIdCuenta(idCuenta);
-
-            List<Object[]> filas = new ArrayList<>();
-            for (Cliente titulare : titulares) {
-                Object[] cuentaDeFila = new Object[7];
-                cuentaDeFila[0] = idCuenta;
-                cuentaDeFila[1] = banco.getCuentas()[i].getTipoCuenta();
-                cuentaDeFila[2] = banco.getCuentas()[i].getEstadoCuenta();
-                cuentaDeFila[3] = banco.getCuentas()[i].getNumeroCuenta();
-                cuentaDeFila[4] = titulare.getNombres() + " " + titulare.getApellidos();
-                cuentaDeFila[5] = banco.getCuentas()[i].getSaldo();
-                cuentaDeFila[6] = banco.getCuentas()[i].getMoneda();
-                filas.add(cuentaDeFila);
-            }
-            bloque.add(filas);
-        }
-        return bloque;
-    }
-    
-    public DefaultListModel<String> cargarModeloLista() {
+    public DefaultListModel<String> filtrarTitulares(String texto) {
         DefaultListModel<String> modeloLista = new DefaultListModel<>();
-        modeloLista.removeAllElements();
-        for (int i = 0; i < banco.getClientes().length - 1; i++) {
-            Cliente c = banco.getClientes()[i];
-            modeloLista.addElement(c.getNombres() + " " + c.getApellidos());
+
+        List<Cliente> clientes = clienteDAO.filtrarClientes(texto);
+        for (Cliente c : clientes) {
+            modeloLista.addElement(c.getIdCliente() + ". " + c.getNombres() + " " + c.getApellidos());
         }
+
         return modeloLista;
+    }
+
+    public void recibirIds(DefaultListModel<String> modeloTitulares){
+        int[] localIdClientes = new int[modeloTitulares.getSize()];
+        if (modeloTitulares.getSize() > 1) {
+            for (int i = 0; i < localIdClientes.length; i++) {
+                int id = Integer.parseInt(modeloTitulares.getElementAt(i).split("\\.")[0]);
+                localIdClientes[i] = id;
+                System.out.println(id);
+            }
+            setIdClientes(localIdClientes);
+        } else {
+            int id = Integer.parseInt(modeloTitulares.firstElement().split("\\.")[0]);
+            localIdClientes[0] = id;
+            setIdClientes(localIdClientes);
+            System.out.println(id);
+        }
+    }
+
+    public List<Cliente> buscarTitularesCuenta(int idCuenta) {
+        return clienteDAO.buscarClientesPorIdCuenta(idCuenta);
     }
 
     public void setDatosCuenta(TipoCuenta tipoCuenta, EstadoCuenta estadoCuenta, Moneda tipoMoneda) {

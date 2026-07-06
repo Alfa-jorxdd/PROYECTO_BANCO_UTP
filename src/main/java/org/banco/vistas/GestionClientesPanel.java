@@ -1,26 +1,26 @@
 package org.banco.vistas;
 
+import java.awt.Window;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import org.banco.enums.Formato;
 import org.banco.logica.mantenimiento.MantenimientoCliente;
-import org.banco.modelos.Banco;
 
 public final class GestionClientesPanel extends javax.swing.JPanel {
 
     private final DefaultTableModel dtm;
-    private final Banco banco;
     private final MantenimientoCliente mc;
     private boolean ascendente = true;
 
-    public GestionClientesPanel(Banco banco) {
+    public GestionClientesPanel() {
         initComponents();
         dtm = (DefaultTableModel) tClientes.getModel();
-        this.banco = banco;
-
-        mc = new MantenimientoCliente(this.banco);
+        mc = new MantenimientoCliente();
 
         listarClientesTabla();
         initStyles();
@@ -239,6 +239,11 @@ public final class GestionClientesPanel extends javax.swing.JPanel {
         jPanel1.add(txtTelefono, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 90, 190, -1));
 
         btnReporte.setText("Reporte");
+        btnReporte.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReporteActionPerformed(evt);
+            }
+        });
         jPanel1.add(btnReporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 70, 90, 30));
 
         jLabel4.setText("Correo:");
@@ -344,6 +349,24 @@ public final class GestionClientesPanel extends javax.swing.JPanel {
         txtBsucarPor.requestFocus();
     }//GEN-LAST:event_btnCancelarActionPerformed
 
+    private void btnReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReporteActionPerformed
+        Window ventanaPadre = SwingUtilities.getWindowAncestor(this);
+        ReporteDialog reporteDialog = new ReporteDialog((JFrame) ventanaPadre, true);
+        
+        if (reporteDialog.isConfirmado()) {
+            String nombre = reporteDialog.getNombreArchivo();
+            Formato formato = reporteDialog.getFormato();
+            mc.generarReporte(
+                    nombre
+                    , formato
+                    , ascendente
+                    , boxOrdenarPor.getSelectedIndex()
+                    , boxBuscarPor.getSelectedIndex()
+                    , txtBsucarPor.getText()
+            );
+        }
+    }//GEN-LAST:event_btnReporteActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> boxBuscarPor;
     private javax.swing.JComboBox<String> boxOrdenarPor;
@@ -374,5 +397,4 @@ public final class GestionClientesPanel extends javax.swing.JPanel {
     public JTable getTablaCliente() {
         return tClientes;
     }
-
 }

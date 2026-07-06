@@ -1,5 +1,6 @@
 package org.banco.vistas;
 
+import java.awt.Window;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
@@ -7,19 +8,21 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.table.DefaultTableModel;
+
 import org.banco.logica.mantenimiento.MantenimientoCuenta;
-import org.banco.modelos.Banco;
 import org.banco.modelos.Cliente;
 import org.banco.enums.EstadoCuenta;
+import org.banco.enums.Formato;
 import org.banco.enums.Moneda;
 import org.banco.enums.TipoCuenta;
 
+import java.util.List;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
 public class GestionCuentasPanel extends javax.swing.JPanel {
 
-    private final Banco banco;
-    private final MantenimientoCuenta mc;
-    private final DefaultListModel<String> modeloResultados = new DefaultListModel<>();
-    private DefaultListModel<String> modeloLista = new DefaultListModel<>();
+    private final MantenimientoCuenta mcu;
     private final DefaultListModel<String> modeloTitulares = new DefaultListModel<>();
     private final DefaultTableModel dtm;
 
@@ -27,18 +30,14 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
 
     private boolean habilitarActualizar = false;
 
-    public GestionCuentasPanel(Banco banco) {
+    public GestionCuentasPanel() {
         initComponents();
         initStyles();
 
         dtm = (DefaultTableModel) tCuentas.getModel();
 
-        this.banco = banco;
-        mc = new MantenimientoCuenta(banco);
+        mcu = new MantenimientoCuenta();
 
-        modeloLista = mc.cargarModeloLista();
-        
-        listResultados.setModel(modeloResultados);
         listarCuentasTabla();
         btnAscDesc.setText("Desc");
 
@@ -119,15 +118,9 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
 
     //Encuentra coincidencias con los elementos del modeloLista
     private void filtrarModel() {
-        String texto = txtBuscarTitular.getText().trim().toLowerCase();
-        modeloResultados.clear();
-        for (int i = 0; i < modeloLista.size(); i++) {
-            String elemento = modeloLista.getElementAt(i).toLowerCase();
-            String Elemento = modeloLista.getElementAt(i);
-            if (elemento.contains(texto)) {
-                modeloResultados.addElement(Elemento);
-            }
-        }
+        String texto = txtBuscarTitular.getText().trim();
+        DefaultListModel<String> resultados = mcu.filtrarTitulares(texto);
+        listResultados.setModel(resultados);
     }
 
     //Devuelte true si todos los campos no están vacíos
@@ -147,7 +140,7 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
 
     //Llena toda la tabla de cuentas llamando al metodo listar de la clase Mantenimiento Cuenta
     private void listarCuentasTabla() {
-        mc.listar(dtm, ascendente, boxOrdenarPor.getSelectedIndex(), boxBuscarPor.getSelectedIndex(), txtBuscarCuenta.getText());
+        mcu.listar(dtm, ascendente, boxOrdenarPor.getSelectedIndex(), boxBuscarPor.getSelectedIndex(), txtBuscarCuenta.getText());
     }
 
     //Limpia todos los campos del formulario
@@ -165,29 +158,19 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
         EstadoCuenta estado = EstadoCuenta.values()[boxEstado.getSelectedIndex() - 1];
         Moneda moneda = Moneda.values()[boxMoneda.getSelectedIndex() - 1];
 
-        mc.setDatosCuenta(TipoCuenta.values()[boxTpoCuenta.getSelectedIndex() - 1], estado, moneda);
-        if (modeloTitulares.getSize() > 1) {
-            int[] idClientes = new int[modeloTitulares.getSize()];
-            for (int i = 0; i < idClientes.length; i++) {
-                idClientes[i] = banco.buscarIdClientePorNombre(modeloTitulares.getElementAt(i));
-            }
-            mc.setIdClientes(idClientes);
-        } else {
-            int[] idCliente = new int[1];
-            idCliente[0] = banco.buscarIdClientePorNombre(modeloTitulares.firstElement());
-            mc.setIdClientes(idCliente);
-        }
+        mcu.setDatosCuenta(TipoCuenta.values()[boxTpoCuenta.getSelectedIndex() - 1], estado, moneda);
+        mcu.recibirIds(modeloTitulares);
     }
 
     private void agregar() {
         enviarDatosMC();
-        mc.agregar();
+        mcu.agregar();
     }
 
     private void actualizar() {
-        mc.setIdCuenta((int) dtm.getValueAt(tCuentas.getSelectedRow(), 0));
+        mcu.setIdCuenta((int) dtm.getValueAt(tCuentas.getSelectedRow(), 0));
         enviarDatosMC();
-        mc.actualizar();
+        mcu.actualizar();
     }
 
     private void eliminar() {
@@ -196,8 +179,8 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
             int filaSeleccionada = tCuentas.getSelectedRow();
             int idCuenta = (int) dtm.getValueAt(filaSeleccionada, 0);
 
-            mc.setIdCuenta(idCuenta);
-            mc.eliminar();
+            mcu.setIdCuenta(idCuenta);
+            mcu.eliminar();
 
             listarCuentasTabla();
 
@@ -278,7 +261,8 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
             tCuentas.getColumnModel().getColumn(1).setPreferredWidth(50);
             tCuentas.getColumnModel().getColumn(2).setPreferredWidth(30);
             tCuentas.getColumnModel().getColumn(3).setResizable(false);
-            tCuentas.getColumnModel().getColumn(4).setPreferredWidth(120);
+            tCuentas.getColumnModel().getColumn(3).setPreferredWidth(10);
+            tCuentas.getColumnModel().getColumn(4).setPreferredWidth(200);
             tCuentas.getColumnModel().getColumn(5).setResizable(false);
             tCuentas.getColumnModel().getColumn(6).setResizable(false);
             tCuentas.getColumnModel().getColumn(6).setPreferredWidth(20);
@@ -309,6 +293,11 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
         jPanel1.add(boxEstado, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 30, -1, -1));
 
         btnReporte.setText("Reporte");
+        btnReporte.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReporteActionPerformed(evt);
+            }
+        });
         jPanel1.add(btnReporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 90, 90, 30));
 
         jLabel4.setText("Moneda:");
@@ -423,7 +412,9 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
     private void btnEliminarTitularActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarTitularActionPerformed
         int indice = listTitulares.getSelectedIndex();
         if (indice != -1) {
-            modeloTitulares.removeElementAt(indice);
+            if (boxTpoCuenta.getSelectedIndex() != 3){
+                modeloTitulares.removeElementAt(indice);
+            }
         }
     }//GEN-LAST:event_btnEliminarTitularActionPerformed
 
@@ -438,6 +429,7 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
             actualizar();
         }
 
+        txtBuscarTitular.setEnabled(true);
         limpiarFormulario();
         listarCuentasTabla();
     }//GEN-LAST:event_btnAgregar_ActualizarActionPerformed
@@ -448,27 +440,27 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
             modeloTitulares.removeAllElements();
 
             int idCuenta = (int) dtm.getValueAt(tCuentas.getSelectedRow(), 0);
-            Cliente[] clientes = banco.buscarClientesPorIdCuenta(idCuenta);
-            if (clientes.length > 1) {
-                for (Cliente cliente : clientes) {
-                    modeloTitulares.addElement(cliente.getNombres() + " " + cliente.getApellidos());
-                }
-            } else {
-                modeloTitulares.addElement(clientes[0].getNombres() + " " + clientes[0].getApellidos());
+            List<Cliente> clientes = mcu.buscarTitularesCuenta(idCuenta);
+            for (Cliente cliente : clientes) {
+                modeloTitulares.addElement(cliente.getIdCliente() + ". " + cliente.getNombres() + " " + cliente.getApellidos());
             }
 
-            TipoCuenta tipoCuenta = (TipoCuenta) dtm.getValueAt(tCuentas.getSelectedRow(), 1);
+            TipoCuenta tipoCuenta = TipoCuenta.valueOf(dtm.getValueAt(tCuentas.getSelectedRow(), 1).toString());
             int indexTipoCuenta = tipoCuenta.ordinal() + 1;
             boxTpoCuenta.setSelectedIndex(indexTipoCuenta);
             boxTpoCuenta.setEnabled(false);
 
-            EstadoCuenta estado = (EstadoCuenta) dtm.getValueAt(tCuentas.getSelectedRow(), 2);
+            EstadoCuenta estado = EstadoCuenta.valueOf(dtm.getValueAt(tCuentas.getSelectedRow(), 2).toString());
             int indexEstado = estado.ordinal() + 1;
             boxEstado.setSelectedIndex(indexEstado);
 
-            Moneda moneda = (Moneda) dtm.getValueAt(tCuentas.getSelectedRow(), 6);
+            Moneda moneda = Moneda.valueOf(dtm.getValueAt(tCuentas.getSelectedRow(), 6).toString());
             int indexMoneda = moneda.ordinal() + 1;
             boxMoneda.setSelectedIndex(indexMoneda);
+
+            if (tipoCuenta != TipoCuenta.MANCOMUNADA){
+                txtBuscarTitular.setEnabled(false);
+            }
 
             btnAgregar_Actualizar.setText("Actualizar");
         }
@@ -488,8 +480,27 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
         limpiarFormulario();
         boxTpoCuenta.setEnabled(true);
         boxTpoCuenta.setSelectedIndex(0);
+        txtBuscarTitular.setEnabled(true);
         txtBuscarCuenta.requestFocus();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void btnReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReporteActionPerformed
+        Window ventanaPadre = SwingUtilities.getWindowAncestor(this);
+        ReporteDialog reporteDialog = new ReporteDialog((JFrame) ventanaPadre, true);
+        
+        if (reporteDialog.isConfirmado()) {
+            String nombre = reporteDialog.getNombreArchivo();
+            Formato formato = reporteDialog.getFormato();
+            mcu.generarReporte(
+                    nombre
+                    , formato
+                    , ascendente
+                    , boxOrdenarPor.getSelectedIndex()
+                    , boxBuscarPor.getSelectedIndex()
+                    , txtBuscarCuenta.getText()
+            );
+        }
+    }//GEN-LAST:event_btnReporteActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

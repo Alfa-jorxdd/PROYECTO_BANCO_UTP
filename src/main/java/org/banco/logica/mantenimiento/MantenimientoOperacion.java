@@ -14,97 +14,95 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.table.DefaultTableModel;
-import org.banco.enums.EstadoCuenta;
-import org.banco.modelos.Banco;
-import org.banco.modelos.Cuenta;
-import org.banco.enums.Moneda;
-import org.banco.enums.TipoCuenta;
-import org.banco.enums.TipoOperacion;
+
+import org.banco.dao.ClienteDAO;
+import org.banco.dao.CuentaDAO;
+import org.banco.dao.OperacionDAO;
+import org.banco.enums.*;
+import org.banco.logica.ReporteExcel;
+import org.banco.logica.ReporteHtml;
+import org.banco.logica.ReportePdf;
+import org.banco.modelos.*;
 import org.banco.interfaces.Operable;
-import org.banco.modelos.Cliente;
-import org.banco.modelos.Cuenta_Ahorro;
-import org.banco.modelos.Cuenta_Corriente;
-import org.banco.modelos.RegistroOperacion;
-import org.banco.modelos.Voucher;
 
 public class MantenimientoOperacion implements Operable {
 
-    private Banco banco;
+    private CuentaDAO cuentaDAO;
+    private ClienteDAO clienteDAO;
+    private OperacionDAO operacionDAO;
 
-    public MantenimientoOperacion(Banco banco) {
-        this.banco = banco;
+    public MantenimientoOperacion() {
+        cuentaDAO = new CuentaDAO();
+        operacionDAO = new OperacionDAO();
+        clienteDAO = new ClienteDAO();
     }
 
     @Override
     public void depositar(long numeroCuenta, double monto, Moneda monedaOperacion, int DNI) {
         //Obtener datos esenciales
-        Cuenta cuenta = banco.buscarCuentaPorNumeroCuenta(numeroCuenta);
+        Cuenta cuenta = cuentaDAO.buscarCuentaPorNumeroCuenta(numeroCuenta);
         if (!cuentaExiste(cuenta)) {
             return;
         }
 
         double montoDepositar = montoSegunMoneda(monto, monedaOperacion, cuenta);
         //Validar el deposito
-        if (!depositoValido(cuenta, montoDepositar)) {
+        if (!depositoValido(cuenta, montoDepositar, true)) {
             return;
         }
+        System.out.println("Monto a depositar: " + montoDepositar);
         //Realizar el deposito
-        cuenta.setSaldo(montoDepositar);
-        if (cuenta.getTipoCuenta() == TipoCuenta.AHORRO) {
-            Cuenta_Ahorro cuenta_Ahorro = (Cuenta_Ahorro) cuenta;
-            cuenta_Ahorro.aumentarContador();
-        }
+        cuenta.agregarSaldo(montoDepositar);
+        System.out.println("Saldo actual de la cuenta: " + cuenta.getSaldo());
+        cuentaDAO.actualizarCuenta(cuenta);
 
-        //Generar registro de la operaciión y VOUCHER
-        int[] idCuenta = {cuenta.getIdCuenta()};
-
-        RegistroOperacion nuevaOperacion = banco.agregarListaOperaciones(idCuenta, DNI, TipoOperacion.DEPOSITO, montoDepositar, monedaOperacion);
-        Voucher voucherOperacion = new Voucher(nuevaOperacion, banco);
+        Operacion nuevaOperacion = new Operacion(cuenta.getIdCuenta(), numeroCuenta, DNI, TipoOperacion.DEPOSITO, monto, monedaOperacion);
+        operacionDAO.agregarOperacion(nuevaOperacion);
+        Voucher voucherOperacion = new Voucher(nuevaOperacion);
         voucherOperacion.imprimirVoucher();
     }
 
     @Override
     public void retirar(long numeroCuenta, double monto, Moneda monedaOperacion, int DNI) {
 
-        Cuenta cuenta = banco.buscarCuentaPorNumeroCuenta(numeroCuenta);
+        Cuenta cuenta = cuentaDAO.buscarCuentaPorNumeroCuenta(numeroCuenta);
         if (!cuentaExiste(cuenta)) {
             return;
         }
         double montoRetirar = montoSegunMoneda(monto, monedaOperacion, cuenta);
-        System.out.println(montoRetirar);
+
         //Validar el retiro
         if (!retiroValido(cuenta, montoRetirar, true)) {
             return;
         }
         //Realizar retiro
-        cuenta.setSaldo(-montoRetirar);
-        if (cuenta.getTipoCuenta() == TipoCuenta.AHORRO) {
-            Cuenta_Ahorro cuenta_Ahorro = (Cuenta_Ahorro) cuenta;
-            cuenta_Ahorro.aumentarContador();
-        }
-        //Generar registro de la operacion y VOUCHER
-        int[] idCuenta = {cuenta.getIdCuenta()};
+        cuenta.agregarSaldo(-montoRetirar);
+        cuentaDAO.actualizarCuenta(cuenta);
 
-        RegistroOperacion nuevaOperacion = banco.agregarListaOperaciones(idCuenta, DNI, TipoOperacion.RETIRO, montoRetirar, monedaOperacion);
-        Voucher voucherOperacion = new Voucher(nuevaOperacion, banco);
+        //Generar registro de la operacion y VOUCHER
+
+        Operacion nuevaOperacion = new Operacion(cuenta.getIdCuenta(), numeroCuenta, DNI, TipoOperacion.RETIRO, monto, monedaOperacion);
+        operacionDAO.agregarOperacion(nuevaOperacion);
+        Voucher voucherOperacion = new Voucher(nuevaOperacion);
         voucherOperacion.imprimirVoucher();
     }
 
     @Override
     public void consultar(long numeroCuenta) {
-        Cuenta cuenta = banco.buscarCuentaPorNumeroCuenta(numeroCuenta);
+        Cuenta cuenta = cuentaDAO.buscarCuentaPorNumeroCuenta(numeroCuenta);
         if (!cuentaExiste(cuenta)) {
             return;
         }
-        RegistroOperacion nuevaOperacion = banco.agregarListaOperaciones(cuenta.getIdCuenta(), TipoOperacion.CONSULTA);
-        Voucher voucher = new Voucher(nuevaOperacion, banco);
+        Operacion nuevaOperacion = new Operacion(cuenta.getIdCuenta(), TipoOperacion.CONSULTA, numeroCuenta);
+        operacionDAO.agregarOperacion(nuevaOperacion);
+        Voucher voucher = new Voucher(nuevaOperacion);
         voucher.imprimirVoucher();
     }
 
     @Override
     public void transferir(long numeroCuentaOrigen, long numeroCuentaDestino, double monto, Moneda monedaOperacion, int DNI) {
-        Cuenta cuentaOrigen = banco.buscarCuentaPorNumeroCuenta(numeroCuentaOrigen);
-        Cuenta cuentaDestino = banco.buscarCuentaPorNumeroCuenta(numeroCuentaDestino);
+        Cuenta cuentaOrigen = cuentaDAO.buscarCuentaPorNumeroCuenta(numeroCuentaOrigen);
+        Cuenta cuentaDestino = cuentaDAO.buscarCuentaPorNumeroCuenta(numeroCuentaDestino);
         if (!cuentaExiste(cuentaOrigen)) {
             if (!cuentaExiste(cuentaDestino)) {
                 return;
@@ -119,21 +117,19 @@ public class MantenimientoOperacion implements Operable {
             return;
         }
         //Ejecuta la transferencia
-        cuentaOrigen.setSaldo(-montoRetiro);
-        if (cuentaOrigen.getTipoCuenta() == TipoCuenta.AHORRO) {
-            Cuenta_Ahorro cuenta_Ahorro = (Cuenta_Ahorro) cuentaOrigen;
-            cuenta_Ahorro.aumentarContador();
-        }
+        cuentaOrigen.agregarSaldo(-montoRetiro);
+        cuentaDestino.agregarSaldo(montoDeposito);
+        cuentaDAO.actualizarCuenta(cuentaOrigen);
+        cuentaDAO.actualizarCuenta(cuentaDestino);
 
-        cuentaDestino.setSaldo(montoDeposito);
+        Operacion operacionTransferenciaEnviada = new Operacion(cuentaOrigen.getIdCuenta(), cuentaDestino.getIdCuenta(), numeroCuentaOrigen, numeroCuentaDestino, DNI, TipoOperacion.TRANSFERENCIA_ENVIADA, monedaOperacion, montoRetiro);
+        Operacion operacionTransferenciaRecibida = new Operacion(cuentaOrigen.getIdCuenta(), cuentaDestino.getIdCuenta(), numeroCuentaOrigen, numeroCuentaDestino, DNI, TipoOperacion.TRANSFERENCIA_RECIBIDA, monedaOperacion, montoDeposito);
+        operacionDAO.agregarOperacion(operacionTransferenciaEnviada);
+        operacionDAO.agregarOperacion(operacionTransferenciaRecibida);
 
-        int[] idCuentas = {cuentaOrigen.getIdCuenta(), cuentaDestino.getIdCuenta()};
-        RegistroOperacion operacionTransferenciaEnviada = banco.agregarListaOperaciones(idCuentas, DNI, TipoOperacion.TRANSFERENCIA_ENVIADA, montoRetiro, monedaOperacion);
-        RegistroOperacion operacionTransferenciaRecibida = banco.agregarListaOperaciones(idCuentas, DNI, TipoOperacion.TRANSFERENCIA_RECIBIDA, montoDeposito, monedaOperacion);
-
-        Voucher vaucherTransferenciaEnv = new Voucher(operacionTransferenciaEnviada, banco);
+        Voucher vaucherTransferenciaEnv = new Voucher(operacionTransferenciaEnviada);
         vaucherTransferenciaEnv.imprimirVoucher();
-        Voucher voucherTransferenciaRec = new Voucher(operacionTransferenciaRecibida, banco);
+        Voucher voucherTransferenciaRec = new Voucher(operacionTransferenciaRecibida);
         voucherTransferenciaRec.imprimirVoucher();
 
     }
@@ -188,7 +184,7 @@ public class MantenimientoOperacion implements Operable {
         switch (tipoCuenta) {
             case AHORRO:
                 Cuenta_Ahorro cuenta_Ahorro = (Cuenta_Ahorro) cuenta;
-                if (cuenta_Ahorro.getContador() >= cuenta_Ahorro.getLimiteTransaccionesDiarios()) {
+                if (cuentaDAO.operacionesRealizadasHoy(cuenta.getIdCuenta()) >= cuenta_Ahorro.getLimiteTransaccionesDiarios()) {
                     JOptionPane.showMessageDialog(null, "Esta cuenta a llegado a su límite de operaciones diarias", "Operación denegada", JOptionPane.WARNING_MESSAGE);
                     retiroValido = false;
                     break;
@@ -224,7 +220,7 @@ public class MantenimientoOperacion implements Operable {
         return retiroValido;
     }
 
-    private boolean depositoValido(Cuenta cuenta, double monto) {
+    private boolean depositoValido(Cuenta cuenta, double monto, boolean requiereValidacionLimiteDiario) {
         if (!montoValido(cuenta, monto)) {
             return false;
         }
@@ -234,9 +230,9 @@ public class MantenimientoOperacion implements Operable {
 
         boolean esValido = true;
 
-        if (cuenta.getTipoCuenta() == TipoCuenta.AHORRO) {
-            Cuenta_Ahorro cuenta_Ahorro = (Cuenta_Ahorro) cuenta;
-            if (cuenta_Ahorro.getContador() >= cuenta_Ahorro.getLimiteTransaccionesDiarios()) {
+        if (cuenta.getTipoCuenta() == TipoCuenta.AHORRO && requiereValidacionLimiteDiario) {
+            Cuenta_Ahorro cuentaAhorro = (Cuenta_Ahorro) cuenta;
+            if (cuentaDAO.operacionesRealizadasHoy(cuenta.getIdCuenta()) >= cuentaAhorro.getLimiteTransaccionesDiarios()) {
                 JOptionPane.showMessageDialog(null, "Esta cuenta a llegado a su límite de operaciones diarias", "Operación denegada", JOptionPane.WARNING_MESSAGE);
                 esValido = false;
             }
@@ -263,7 +259,7 @@ public class MantenimientoOperacion implements Operable {
         if (!retiroValido(cuentaOrigen, montoRetiro, false)) {
             return false;
         }
-        if (!depositoValido(cuentaDestino, montoDeposito)) {
+        if (!depositoValido(cuentaDestino, montoDeposito, false)) {
             return false;
         }
 
@@ -271,17 +267,17 @@ public class MantenimientoOperacion implements Operable {
     }
 
     private boolean autorizaciónMancomunada(Cuenta cuenta) {
-        Cliente[] titulares = banco.buscarClientesPorIdCuenta(cuenta.getIdCuenta());
+        List<Cliente> titulares = clienteDAO.buscarClientesPorIdCuenta(cuenta.getIdCuenta());
 
-        JCheckBox[] checks = new JCheckBox[titulares.length];
+        JCheckBox[] checks = new JCheckBox[titulares.size()];
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(new JLabel("Todos los titulares deben confirmar la operación"));
         panel.add(new JLabel("================================================"));
         panel.add(Box.createVerticalStrut(10));
 
-        for (int i = 0; i < titulares.length; i++) {
-            checks[i] = new JCheckBox(titulares[i].getNombres() + " " + titulares[i].getApellidos());
+        for (int i = 0; i < titulares.size(); i++) {
+            checks[i] = new JCheckBox(titulares.get(i).getNombres() + " " + titulares.get(i).getApellidos());
             panel.add(checks[i]);
         }
 
@@ -309,96 +305,50 @@ public class MantenimientoOperacion implements Operable {
         }
         return true;
     }
+    
+    public void mostrarVoucher(int idOperacion){
+        Operacion operacion = operacionDAO.buscarOperacionPorId(idOperacion);
+        Voucher voucher = new Voucher(operacion);
+        voucher.imprimirVoucher();
+    }
+    
+    public void generarReporte(String nombre, Formato formato, boolean ascendente, int criterioOrden, int criterioFiltrar, String textoFiltrado){
+        Reporte nuevoReporte = null;
+        switch(formato){
+            case PDF :
+                nuevoReporte = new ReportePdf(nombre, TipoReporte.OPERACIONES);
+                break;
+            case EXCEL :
+                nuevoReporte = new ReporteExcel(nombre, TipoReporte.OPERACIONES);
+                break;
+            case HTML :
+                nuevoReporte = new ReporteHtml(nombre, TipoReporte.OPERACIONES);
+                break;
+        }
+        List<Object[]> lista = operacionDAO.listarOperaciones(ascendente, criterioOrden, criterioFiltrar, textoFiltrado);
+        nuevoReporte.crearReporte(lista);
+    }
     //====================================================================================================================================
     //===============================================LÓGICA PARA LISTAR===================================================================
     @Override
     public void listar(DefaultTableModel dtm, boolean ascendente, int criterioOrden, int criterioFiltrado, String textoFiltrado) {
-        List<List<Object[]>> bloque = construirBloque();
-        bloque = filtrar(bloque, criterioFiltrado, textoFiltrado);
-        
-        Comparator<List<Object[]>> comparador = null;
-        switch (criterioOrden){
-            case 0 : 
-                comparador = (o1, o2) -> Integer.compare((int)o1.get(0)[0], (int)o2.get(0)[0]); break;
-            case 1 :
-                comparador = (o1, o2) -> o1.get(0)[1].toString().compareTo(o2.get(0)[1].toString()); break;
-            case 2 :    
-                comparador = (o1, o2) -> o1.get(0)[2].toString().compareTo(o2.get(0)[2].toString()); break;
-        }
-        bloque.sort(ascendente ? comparador : comparador.reversed());
-        
-        dtm.setRowCount(0);
-        for (List<Object[]> elementos : bloque) {
-            for (Object[] fila : elementos) {
-                dtm.addRow(fila);
-            }
-        }
+        operacionDAO.listarOperaciones(dtm, ascendente, criterioOrden, criterioFiltrado, textoFiltrado);
     }
     
-    private List<List<Object[]>> filtrar(List<List<Object[]>> bloque, int criterioFiltrar, String textoFiltrar){
-        if (textoFiltrar.trim().isEmpty()) {
-            return bloque;
-        }
-        List<List<Object[]>> bloqueFiltrado = new ArrayList<>();
-        String texto = textoFiltrar.toLowerCase().trim();
-        
-        for (List<Object[]> elementos : bloque) {
-            boolean coincide = false;
-            for (Object[] fila : elementos) {
-                if (fila[criterioFiltrar].toString().toLowerCase().contains(texto)) {
-                    coincide = true;
-                    break;
-                }
-            }
-            if (coincide) bloqueFiltrado.add(elementos);
-        }
-        return bloqueFiltrado;
-    }
-    
-    private List<List<Object[]>> construirBloque(){
-        List<List<Object[]>> bloque = new ArrayList<>();
-        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss", new Locale("es", "PE"));
-        
-        for (int i = 0; i < banco.getOperaciones().length - 1; i++) {
-            List<Object[]> elementos = new ArrayList<>();
-            Object[] fila = new Object[3];
-            fila[0] = banco.getOperaciones()[i].getIdOperacion();
-            LocalDateTime fecha = banco.getOperaciones()[i].getFechaOperacion();
-            fila[1] = formato.format(fecha);
-            fila[2] = banco.getOperaciones()[i].getOperacion();
-            elementos.add(fila);
-            bloque.add(elementos);
-        }
-        return bloque;
-    }
-    
-    public void filtrarModelCuenta(String texto, DefaultListModel<String> modeloResultadosCuenta) {
+    public void filtrarModelCuenta(String texto, DefaultListModel<String> modeloLista) {
         String numeroBuscado = texto.trim();
-        modeloResultadosCuenta.clear();
 
         if (numeroBuscado.isEmpty() || !numeroBuscado.matches("[0-9]+")) {
+            modeloLista.clear();
             return;
         }
 
-        for (int i = 0; i < banco.getCuentas().length - 1; i++) {
-            String cuentaTxt = String.valueOf(banco.getCuentas()[i].getNumeroCuenta());
-            
-            if (cuentaTxt.contains(numeroBuscado)) {
-                Cliente[] titulares = banco.buscarClientesPorIdCuenta(banco.getCuentas()[i].getIdCuenta());
-                for (Cliente titulare : titulares) {
-                    String primerNombre = titulare.getNombres().split(" ")[0];
-                    String primerApellido = titulare.getApellidos().split(" ")[0];
-                    modeloResultadosCuenta.addElement(primerNombre + " " + primerApellido + " - " + banco.getCuentas()[i].getNumeroCuenta());
-                }
-            }
-        }
-    }
+        Long numeroCuenta = Long.parseLong(numeroBuscado);
+        modeloLista.clear();
 
-    public void cargarModelosConClientes(DefaultListModel<String> modelo) {
-        modelo.removeAllElements();
-        for (int i = 0; i < banco.getClientes().length - 1; i++) {
-            Cliente c = banco.getClientes()[i];
-            modelo.addElement(c.getNombres() + " " + c.getApellidos());
+        List<String> titulares = clienteDAO.filtrarNombresTitularesSegunNumeroCuenta(numeroCuenta);
+        for (String titulare : titulares) {
+            modeloLista.addElement(titulare);
         }
     }
     
@@ -407,29 +357,28 @@ public class MantenimientoOperacion implements Operable {
         modeloResultadosDNI.clear();
 
         if (dniBuscado.isEmpty() || !dniBuscado.matches("[0-9]+")) {
+            modeloResultadosDNI.clear();
             return;
         }
 
-        for (int i = 0; i < banco.getClientes().length - 1; i++) {
-            String dniTxt = String.valueOf(banco.getClientes()[i].getDni());
-            String primerNombre = banco.getClientes()[i].getNombres().split(" ")[0];
-            String primerApellido = banco.getClientes()[i].getApellidos().split(" ")[0];
+        int Dni = Integer.parseInt(dni);
+        modeloResultadosDNI.clear();
 
-            if (dniTxt.contains(dniBuscado)) {
-                modeloResultadosDNI.addElement(primerNombre + " " + primerApellido + " - " + dniTxt);
-            }
+        List<String> titulares = clienteDAO.filtrarNombresClientesPorDni(Dni);
+        for (String titulare : titulares) {
+            modeloResultadosDNI.addElement(titulare);
         }
     }
     
     public void ponerTipoDeCuentaSiExiste(String txtNumeroCuenta, JLabel labelTipoCuenta) {
         String texto = txtNumeroCuenta.trim();
 
-        if (texto.isEmpty() || !texto.matches("\\d+")) {
+        if (texto.isEmpty() || !texto.matches("\\d+") || !txtNumeroCuenta.matches("[0-9]{10}")) {
             labelTipoCuenta.setText("");
             return;
         }
         Long numeroCuenta = Long.valueOf(texto);
-        Cuenta cuenta = banco.buscarCuentaPorNumeroCuenta(numeroCuenta);
+        Cuenta cuenta = cuentaDAO.buscarCuentaPorNumeroCuenta(numeroCuenta);
         if (cuenta != null) {
             labelTipoCuenta.setText(cuenta.getTipoCuenta().toString());
         } else {

@@ -5,31 +5,33 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import javax.swing.JPanel;
-import org.banco.modelos.Banco;
+import org.banco.config.ConexionSQLServer;
 import org.netbeans.lib.awtextra.AbsoluteConstraints;
 
 public final class Dashboard extends javax.swing.JFrame {
-    
+
     private final TopBar topBar;
-    private final int widthPanel = 1120;
-    private final int heigthPanel = 30;
-    private final Banco banco;
-    
-    public Dashboard(Banco banco) {
+
+    public Dashboard() {
         initComponents();
         initStyles();
-        
-        this.banco = banco;
+
         topBar = new TopBar(this);
-        
-        bg.add(topBar, new AbsoluteConstraints(0,0,widthPanel,heigthPanel));
+
+        int widthPanel = 1120;
+        int heightPanel = 30;
+        bg.add(topBar, new AbsoluteConstraints(0,0, widthPanel, heightPanel));
         bg.setComponentZOrder(topBar, 1);
         
         this.setVisible(true);
         this.setLocationRelativeTo(null);
         
-        mostrarPanel(new Principal(banco), "Inicio");
+        mostrarPanel(new Principal(), "Inicio");
         mostrarFecha();
+        
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            ConexionSQLServer.getInstancia().cerrarConexion();
+        }));
     }
     
     private void mostrarPanel(JPanel panel, String titulo){
@@ -102,7 +104,7 @@ public final class Dashboard extends javax.swing.JFrame {
         );
 
         txtBienvenida.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        txtBienvenida.setText("¡Bienvenido!    -> ");
+        txtBienvenida.setText("¡Bienvenido!     > ");
 
         txtFecha.setText("30 abr. 2026");
 
@@ -235,19 +237,19 @@ public final class Dashboard extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnInicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInicioActionPerformed
-        mostrarPanel(new Principal(banco), "Inicio");
+        mostrarPanel(new Principal(), "Inicio");
     }//GEN-LAST:event_btnInicioActionPerformed
     
     private void btnGestionClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGestionClientesActionPerformed
-        mostrarPanel(new GestionClientesPanel(banco), "Gestión de Clientes");
+        mostrarPanel(new GestionClientesPanel(), "Gestión de Clientes");
     }//GEN-LAST:event_btnGestionClientesActionPerformed
     
     private void btnGestionCuentasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGestionCuentasActionPerformed
-        mostrarPanel(new GestionCuentasPanel(banco), "Gestión de Cuentas");
+        mostrarPanel(new GestionCuentasPanel(), "Gestión de Cuentas");
     }//GEN-LAST:event_btnGestionCuentasActionPerformed
     
     private void btnOperacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOperacionesActionPerformed
-        mostrarPanel(new OperacionPanel(banco), "Operaciones");
+        mostrarPanel(new OperacionPanel(), "Operaciones");
     }//GEN-LAST:event_btnOperacionesActionPerformed
 
 

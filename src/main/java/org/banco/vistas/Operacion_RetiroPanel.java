@@ -5,31 +5,23 @@ import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import org.banco.logica.mantenimiento.MantenimientoOperacion;
-import org.banco.modelos.Banco;
 import org.banco.enums.Moneda;
 
 public class Operacion_RetiroPanel extends javax.swing.JPanel {
 
-    private Banco banco;
-    private DefaultListModel<String> modeloListaCuenta = new DefaultListModel<>();
-    private DefaultListModel<String> modeloResultadosCuenta = new DefaultListModel<>();
-    private DefaultListModel<String> modeloListaDNI = new DefaultListModel<>();
-    private DefaultListModel<String> modeloResultadosDNI = new DefaultListModel<>();
+    private final DefaultListModel<String> modeloResultadosCuenta = new DefaultListModel<>();
+    private final DefaultListModel<String> modeloResultadosDNI = new DefaultListModel<>();
     
-    private MantenimientoOperacion mo;
+    private final MantenimientoOperacion mo;
 
-    public Operacion_RetiroPanel(Banco banco) {
+    public Operacion_RetiroPanel() {
         initComponents();
         InitStyles();
 
-        this.banco = banco;
-        mo = new MantenimientoOperacion(banco);
+        mo = new MantenimientoOperacion();
 
         listNumeroCuenta.setModel(modeloResultadosCuenta);
         listDNI.setModel(modeloResultadosDNI);
-
-        mo.cargarModelosConClientes(modeloListaCuenta);
-        mo.cargarModelosConClientes(modeloListaDNI);
 
         txtNumeroCuenta.getDocument().addDocumentListener(new DocumentListener() {
             @Override

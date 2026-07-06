@@ -1,26 +1,41 @@
 package org.banco.modelos;
 
 public class Cliente {
-    private static int idIncrementar = 0;
-    private final int idCliente;
+    private int idCliente;
     private String nombres;
     private String apellidos;
     private int dni;
     private int telefono;
     private String correo;
 
-    public Cliente(String nombres, String apellidos, int dni, int telefono, String correo) {
+    public Cliente(int idCliente, String nombres, String apellidos, int dni, int telefono, String correo) {
+        this.idCliente = idCliente;
         this.nombres = nombres;
         this.apellidos = apellidos;
         this.dni = dni;
-        this.idCliente = ++idIncrementar;
         this.telefono = telefono;
         this.correo = correo;
     }
 
+    public Cliente(String nombres, String apellidos, int dni, int telefono, String correo) {
+        this.nombres = nombres;
+        this.apellidos = apellidos;
+        this.dni = dni;
+        this.telefono = telefono;
+        this.correo = correo;
+        this.idCliente = 0;
+    }
+
     @Override
     public String toString() {
-        return String.format("Nombre: %s | DNI: %d", nombres, dni);
+        return "Cliente{" +
+                "idCliente=" + idCliente +
+                ", nombres='" + nombres + '\'' +
+                ", apellidos='" + apellidos + '\'' +
+                ", dni=" + dni +
+                ", telefono=" + telefono +
+                ", correo='" + correo + '\'' +
+                '}';
     }
 
     public void setNombres(String nombre) {

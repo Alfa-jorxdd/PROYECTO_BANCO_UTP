@@ -1,25 +1,30 @@
 package org.banco.vistas;
 
+import java.awt.Window;
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
+import org.banco.enums.Formato;
+import org.banco.enums.TipoReporte;
+import org.banco.logica.ReporteExcel;
 import org.banco.logica.mantenimiento.MantenimientoOperacion;
 import org.banco.modelos.Banco;
+import org.banco.modelos.Reporte;
 
 public class Operacion_RegistroOperacionesPanel extends javax.swing.JPanel {
 
-    private Banco banco;
     private DefaultTableModel dtm = new DefaultTableModel();
     
     private boolean ascendente = true;
-    private MantenimientoOperacion mo;
+    private final MantenimientoOperacion mo;
 
-    public Operacion_RegistroOperacionesPanel(Banco banco) {
+    public Operacion_RegistroOperacionesPanel() {
         initComponents();
         InitStyles();
 
-        this.banco = banco;
-        mo = new MantenimientoOperacion(banco);
+        mo = new MantenimientoOperacion();
         
         dtm = (DefaultTableModel) tOperaciones.getModel();
         
@@ -71,6 +76,7 @@ public class Operacion_RegistroOperacionesPanel extends javax.swing.JPanel {
         btnAscDesc = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         jLabel3 = new javax.swing.JLabel();
+        btnReporte = new javax.swing.JButton();
 
         setMinimumSize(new java.awt.Dimension(518, 396));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -90,7 +96,7 @@ public class Operacion_RegistroOperacionesPanel extends javax.swing.JPanel {
                 .addGroup(panelTitulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(labelDeposito, javax.swing.GroupLayout.PREFERRED_SIZE, 478, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 284, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(10, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelTitulosLayout.setVerticalGroup(
             panelTitulosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -102,7 +108,7 @@ public class Operacion_RegistroOperacionesPanel extends javax.swing.JPanel {
                 .addContainerGap(15, Short.MAX_VALUE))
         );
 
-        bg.add(panelTitulos, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+        bg.add(panelTitulos, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 400, -1));
 
         jPanel3.setAlignmentX(0.01F);
         jPanel3.setAlignmentY(0.01F);
@@ -126,6 +132,11 @@ public class Operacion_RegistroOperacionesPanel extends javax.swing.JPanel {
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
+            }
+        });
+        tOperaciones.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tOperacionesMouseClicked(evt);
             }
         });
         jScrollPane1.setViewportView(tOperaciones);
@@ -162,6 +173,14 @@ public class Operacion_RegistroOperacionesPanel extends javax.swing.JPanel {
 
         bg.add(jPanel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 90, 520, 310));
 
+        btnReporte.setText("Reporte");
+        btnReporte.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnReporteActionPerformed(evt);
+            }
+        });
+        bg.add(btnReporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 40, -1, -1));
+
         add(bg, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 518, 398));
 
         getAccessibleContext().setAccessibleName("");
@@ -172,6 +191,31 @@ public class Operacion_RegistroOperacionesPanel extends javax.swing.JPanel {
         btnAscDesc.setText(ascendente ? "Asc" : "Desc");
         listarOperacionesTabla();
     }//GEN-LAST:event_btnAscDescActionPerformed
+
+    private void btnReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReporteActionPerformed
+        Window ventanaPadre = SwingUtilities.getWindowAncestor(this);
+        ReporteDialog reporteDialog = new ReporteDialog((JFrame) ventanaPadre, true);
+        
+        if (reporteDialog.isConfirmado()) {
+            String nombre = reporteDialog.getNombreArchivo();
+            Formato formato = reporteDialog.getFormato();
+            mo.generarReporte(
+                    nombre
+                    , formato
+                    , ascendente
+                    , boxOrdenarPor.getSelectedIndex()
+                    , boxBuscarPor.getSelectedIndex()
+                    , txtBuscarPor.getText()
+            );
+        }
+    }
+//GEN-LAST:event_btnReporteActionPerformed
+
+    private void tOperacionesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tOperacionesMouseClicked
+        if (evt.getClickCount() == 2) {
+            mo.mostrarVoucher((int) dtm.getValueAt(tOperaciones.getSelectedRow(), 0));
+        }
+    }//GEN-LAST:event_tOperacionesMouseClicked
     //======================EVENTOS==========================
     
     
@@ -180,6 +224,7 @@ public class Operacion_RegistroOperacionesPanel extends javax.swing.JPanel {
     private javax.swing.JComboBox<String> boxBuscarPor;
     private javax.swing.JComboBox<String> boxOrdenarPor;
     private javax.swing.JButton btnAscDesc;
+    private javax.swing.JButton btnReporte;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;

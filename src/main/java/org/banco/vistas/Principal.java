@@ -6,19 +6,17 @@ import org.banco.modelos.Banco;
 
 public final class Principal extends javax.swing.JPanel {
 
-    private final Banco banco;
     private final DefaultTableModel dtm;
     private final DatosWidgets dw;
     
     private String simboloMoneda = "S/";
 
-    public Principal(Banco banco) {
+    public Principal() {
         initComponents();
         dtm = (DefaultTableModel) tClientesRecientes.getModel();
         initStyles();
 
-        this.banco = banco;
-        dw = new DatosWidgets(banco);
+        dw = new DatosWidgets();
         labelSimbolo.setText(simboloMoneda);
         
         cargarDatosWidgets();
@@ -259,9 +257,17 @@ public final class Principal extends javax.swing.JPanel {
                 {null, null, null, null}
             },
             new String [] {
-                "ID", "Nombre", "Tipo Cuenta", "Estado"
+                "ID", " Nombres", "Apellidos", "Tipo Cuenta"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jscrollUltimosClientes.setViewportView(tClientesRecientes);
 
         txtTitulo.setText("Clientes Recientes");
@@ -280,9 +286,9 @@ public final class Principal extends javax.swing.JPanel {
                     .addComponent(widSaldo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(widCuentas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jscrollUltimosClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 420, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(txtTitulo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jscrollUltimosClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE))
                 .addGap(110, 110, 110))
         );
         jPanel1Layout.setVerticalGroup(

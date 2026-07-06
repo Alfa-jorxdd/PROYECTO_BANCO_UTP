@@ -9,22 +9,16 @@ import org.banco.modelos.Banco;
 
 public class Operacion_ConsultaPanel extends javax.swing.JPanel {
 
-    private Banco banco;
-    private DefaultListModel<String> modeloListaCuenta = new DefaultListModel<>();
     private DefaultListModel<String> modeloResultadosCuenta = new DefaultListModel<>();
     
     private MantenimientoOperacion mo;
 
-    public Operacion_ConsultaPanel(Banco banco) {
+    public Operacion_ConsultaPanel() {
         initComponents();
         InitStyles();
-
-        this.banco = banco;
-        mo  = new MantenimientoOperacion(banco);
-        
+        mo  = new MantenimientoOperacion();
         listNumeroCuenta.setModel(modeloResultadosCuenta);
 
-        mo.cargarModelosConClientes(modeloListaCuenta);
 
         txtNumeroCuenta.getDocument().addDocumentListener(new DocumentListener() {
             @Override

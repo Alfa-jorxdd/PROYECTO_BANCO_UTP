@@ -16,14 +16,16 @@ public class Cuenta_Ahorro extends Cuenta{
         convertirCamposEspecificos(tipoMoneda);
     }
 
+    public Cuenta_Ahorro(int idCuenta, Moneda tipoMoneda, EstadoCuenta estadoCuenta, long numeroCuenta) {
+        super(idCuenta, TipoCuenta.AHORRO, tipoMoneda, estadoCuenta, numeroCuenta);
+        contador = 0;
+        convertirCamposEspecificos(tipoMoneda);
+    }
+
     public int getLimiteTransaccionesDiarios() {
         return limiteTransaccionesDiarios;
     }
 
-    /**
-     *
-     * @return
-     */
     @Override
     public double getMontoLimitePorOperacion() {
         return montoLimitePorOperacion;

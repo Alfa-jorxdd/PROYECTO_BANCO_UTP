@@ -12,6 +12,11 @@ public class Cuenta_Mancomunada extends Cuenta {
         convertirCamposEspecificos(tipoMoneda);
     }
 
+    public Cuenta_Mancomunada(int idCuenta, Moneda tipoMoneda, EstadoCuenta estadoCuenta, long numeroCuenta) {
+        super(idCuenta, TipoCuenta.MANCOMUNADA, tipoMoneda, estadoCuenta, numeroCuenta);
+        convertirCamposEspecificos(tipoMoneda);
+    }
+
     @Override
     public double getMontoLimitePorOperacion() {
         return montoLimitePorOperacion;
