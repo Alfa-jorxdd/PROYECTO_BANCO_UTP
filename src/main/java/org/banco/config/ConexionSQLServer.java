@@ -8,8 +8,8 @@ import javax.swing.JOptionPane;
 public class ConexionSQLServer {
     private Connection conexion = null;
     private static ConexionSQLServer instancia = null;
-    private final String usuario = "userSQL";
-    private final String contraseña = "root";
+    private final String usuario = "sa";
+    private final String contraseña = "Root123!";
     private final String cadenaConexion = "jdbc:sqlserver://localhost:1433;databaseName=Banco;encrypt=true;trustServerCertificate=true";
     
     private ConexionSQLServer (){

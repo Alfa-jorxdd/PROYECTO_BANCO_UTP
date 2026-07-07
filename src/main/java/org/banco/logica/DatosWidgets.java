@@ -6,9 +6,9 @@ import javax.swing.table.DefaultTableModel;
 import org.banco.dao.ClienteDAO;
 import org.banco.dao.CuentaDAO;
 import org.banco.dao.OperacionDAO;
-import org.banco.modelos.Banco;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 
 
 public class DatosWidgets {
@@ -35,8 +35,27 @@ public class DatosWidgets {
     }
     public void cargarSaldoWidgets(JLabel labelSaldo, JLabel labelSimbolo){
         String simbolo = labelSimbolo.getText();
-        BigDecimal saldoTotal = cuentaDAO.contarSaldoDeTodasLasCuentas(simbolo);
-        labelSaldo.setText(String.valueOf(saldoTotal));
+        BigDecimal saldo = cuentaDAO.contarSaldoDeTodasLasCuentas(simbolo);
+        String saldoRedondeado = redondearSaldo(saldo);
+        labelSaldo.setText(saldoRedondeado);
+    }
+
+    private String redondearSaldo(BigDecimal saldo){
+        String[] SUFIJOS = {"", "K", "M", "B", "T"};
+        double valor = saldo.doubleValue();
+        boolean negativo = valor < 0;
+        valor = Math.abs(valor);
+
+        int indiceSufijos = 0;
+        while (valor >= 1000 && indiceSufijos < SUFIJOS.length - 1) {
+            valor /= 1000;
+            indiceSufijos++;
+        }
+
+        DecimalFormat df = new DecimalFormat(indiceSufijos == 0 ? "#,##0.##" : "#,##0.#");
+        String resultado = df.format(valor) + SUFIJOS[indiceSufijos];
+
+        return negativo ? "-" + resultado : resultado;
     }
     
     public void ponerUltimosClientesTabla(DefaultTableModel dtm) {
