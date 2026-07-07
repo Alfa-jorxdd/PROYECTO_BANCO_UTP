@@ -56,6 +56,7 @@ public class DatosWidgets {
         String resultado = df.format(valor) + SUFIJOS[indiceSufijos];
 
         return negativo ? "-" + resultado : resultado;
+
     }
     
     public void ponerUltimosClientesTabla(DefaultTableModel dtm) {
