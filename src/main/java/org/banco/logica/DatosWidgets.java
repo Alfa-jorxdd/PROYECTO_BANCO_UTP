@@ -57,6 +57,8 @@ public class DatosWidgets {
 
         return negativo ? "-" + resultado : resultado;
 
+
+
     }
     
     public void ponerUltimosClientesTabla(DefaultTableModel dtm) {
