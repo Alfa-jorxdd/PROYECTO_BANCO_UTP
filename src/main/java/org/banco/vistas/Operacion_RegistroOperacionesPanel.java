@@ -1,17 +1,17 @@
 package org.banco.vistas;
 
+import com.formdev.flatlaf.FlatClientProperties;
+import com.formdev.flatlaf.extras.FlatSVGIcon;
+import java.awt.Color;
 import java.awt.Window;
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import org.banco.enums.Formato;
-import org.banco.enums.TipoReporte;
-import org.banco.logica.ReporteExcel;
-import org.banco.logica.mantenimiento.MantenimientoOperacion;
-import org.banco.modelos.Banco;
-import org.banco.modelos.Reporte;
+import org.banco.servicios.mantenimiento.MantenimientoOperacion;
 
 public class Operacion_RegistroOperacionesPanel extends javax.swing.JPanel {
 
@@ -23,7 +23,6 @@ public class Operacion_RegistroOperacionesPanel extends javax.swing.JPanel {
     public Operacion_RegistroOperacionesPanel() {
         initComponents();
         InitStyles();
-
         mo = new MantenimientoOperacion();
         
         dtm = (DefaultTableModel) tOperaciones.getModel();
@@ -54,7 +53,39 @@ public class Operacion_RegistroOperacionesPanel extends javax.swing.JPanel {
 
     private void InitStyles() {
         labelDeposito.putClientProperty("FlatLaf.styleClass", "h0");
-        tOperaciones.setShowVerticalLines(true);
+        
+        FlatSVGIcon buscarIcon = new FlatSVGIcon("svg/search.svg", 16, 16);
+        Color colorNaranja = UIManager.getColor("Component.focusColor");
+        buscarIcon.setColorFilter(new FlatSVGIcon.ColorFilter(colorOriginal -> colorNaranja));
+        
+        //BuscarPor
+        txtBuscarPor.putClientProperty("JTextField.leadingIcon", buscarIcon);
+        txtBuscarPor.putClientProperty(FlatClientProperties.STYLE, "arc: 30");
+        txtBuscarPor.putClientProperty(FlatClientProperties.TEXT_FIELD_SHOW_CLEAR_BUTTON, true);
+        
+        txtBuscarPor.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, 
+            "Ingrese el " + boxBuscarPor.getSelectedItem());
+        
+        //ComboBoxes
+        boxBuscarPor.putClientProperty(FlatClientProperties.STYLE, "arc: 20");
+        boxBuscarPor.addActionListener((e) -> {
+            
+            String nombreBusqueda = boxBuscarPor.getSelectedItem().toString();
+            txtBuscarPor.putClientProperty(
+                    FlatClientProperties.PLACEHOLDER_TEXT, 
+                    "Ingrese " + (nombreBusqueda.equals("ID") ? 
+                            " el ID" : nombreBusqueda.endsWith("a") ?
+                            " la " + nombreBusqueda.toLowerCase() : nombreBusqueda.toLowerCase().endsWith("s") ? 
+                            " los " + nombreBusqueda.toLowerCase() : 
+                            " el " + nombreBusqueda.toLowerCase()));
+            
+            txtBuscarPor.repaint();
+        });
+        boxOrdenarPor.putClientProperty(FlatClientProperties.STYLE, "arc: 20");
+        
+        //Botones
+        btnAscDesc.putClientProperty(FlatClientProperties.STYLE, "arc: 20");
+        btnReporte.putClientProperty(FlatClientProperties.STYLE, "arc: 20");
     }
 
     @SuppressWarnings("unchecked")
@@ -179,7 +210,7 @@ public class Operacion_RegistroOperacionesPanel extends javax.swing.JPanel {
                 btnReporteActionPerformed(evt);
             }
         });
-        bg.add(btnReporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 40, -1, -1));
+        bg.add(btnReporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 50, 80, 30));
 
         add(bg, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 518, 398));
 

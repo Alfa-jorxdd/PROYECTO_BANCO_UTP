@@ -1,6 +1,5 @@
-package org.banco.modelos;
+package org.banco.servicios;
 
-import javax.swing.table.DefaultTableModel;
 import org.banco.enums.Formato;
 import org.banco.enums.TipoReporte;
 

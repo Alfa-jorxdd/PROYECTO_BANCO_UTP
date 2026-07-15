@@ -1,4 +1,4 @@
-package org.banco.modelos;
+package org.banco.vistas;
 
 import java.awt.Font;
 import java.time.format.DateTimeFormatter;
@@ -8,11 +8,12 @@ import javax.swing.JTextArea;
 
 import org.banco.dao.CuentaDAO;
 import org.banco.enums.TipoOperacion;
+import org.banco.modelos.Operacion;
 
 public class Voucher {
 
-    private Operacion registroOperacion;
-    private CuentaDAO cuentaDAO;
+    private final Operacion registroOperacion;
+    private final CuentaDAO cuentaDAO;
     private static final int ANCHO = 40;
 
     public Voucher(Operacion registroOperacion) {

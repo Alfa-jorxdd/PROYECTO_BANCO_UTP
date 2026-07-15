@@ -9,9 +9,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 
-import org.apache.poi.xddf.usermodel.PresetPattern;
 import org.banco.config.ConexionSQLServer;
-import org.banco.enums.Formato;
 import org.banco.modelos.Cliente;
 
 public class ClienteDAO {

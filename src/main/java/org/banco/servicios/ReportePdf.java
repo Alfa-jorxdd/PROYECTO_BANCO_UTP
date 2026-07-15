@@ -1,4 +1,4 @@
-package org.banco.logica;
+package org.banco.servicios;
 import com.itextpdf.io.font.constants.StandardFonts;
 import com.itextpdf.kernel.colors.ColorConstants;
 import com.itextpdf.kernel.colors.DeviceRgb;
@@ -14,7 +14,6 @@ import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
 import org.banco.enums.Formato;
 import org.banco.enums.TipoReporte;
-import org.banco.modelos.Reporte;
 
 import java.io.IOException;
 import java.util.List;

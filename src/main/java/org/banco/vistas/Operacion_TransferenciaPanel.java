@@ -1,11 +1,11 @@
 package org.banco.vistas;
 
+import com.formdev.flatlaf.FlatClientProperties;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.banco.logica.mantenimiento.MantenimientoOperacion;
-import org.banco.modelos.Banco;
+import org.banco.servicios.mantenimiento.MantenimientoOperacion;
 import org.banco.enums.Moneda;
 
 public class Operacion_TransferenciaPanel extends javax.swing.JPanel {
@@ -14,11 +14,12 @@ public class Operacion_TransferenciaPanel extends javax.swing.JPanel {
     private final DefaultListModel<String> modeloResultadosCuentaDest = new DefaultListModel<>();
     
     private final MantenimientoOperacion mo;
+    private final OperacionPanel operacionPanel;
 
-    public Operacion_TransferenciaPanel() {
+    public Operacion_TransferenciaPanel(OperacionPanel operacionPanel) {
         initComponents();
         InitStyles();
-
+        this.operacionPanel = operacionPanel;
         mo = new MantenimientoOperacion();
 
         listNumCuentaOrigen.setModel(modeloResultadosCuentaOri);
@@ -67,6 +68,7 @@ public class Operacion_TransferenciaPanel extends javax.swing.JPanel {
     
     private void InitStyles() {
         labelDeposito.putClientProperty("FlatLaf.styleClass", "h0");
+        btnRetirar.putClientProperty(FlatClientProperties.STYLE, "arc: 30");
     }
     
     private boolean formulariosLlenos(){
@@ -316,6 +318,7 @@ public class Operacion_TransferenciaPanel extends javax.swing.JPanel {
         mo.transferir(numCuentaOrigen, numCuentaDestino, monto, monedaOperacion, DNI);
         
         limpiarFormularios();
+        operacionPanel.getDashboard().actualizarDatosDelSistema();
     }
 
 

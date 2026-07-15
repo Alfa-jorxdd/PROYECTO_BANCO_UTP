@@ -1,4 +1,4 @@
-package org.banco.logica;
+package org.banco.servicios;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -9,7 +9,6 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.banco.enums.Formato;
 import org.banco.enums.TipoReporte;
-import org.banco.modelos.Reporte;
 
 public class ReporteExcel extends Reporte{
 

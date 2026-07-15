@@ -8,7 +8,9 @@ import org.banco.vistas.Dashboard;
 public class Main {
     public static void main(String[] args) {
         FlatArcDarkOrangeIJTheme.setup();
-        UIManager.put("Component.arc", 0);
+        UIManager.put("Table.showHorizontalLines", true);
+        UIManager.put("Table.showVerticalLines", true);
+        UIManager.put("Table.alternateRowColor", UIManager.getColor("Panel.background"));
 
         Dashboard pantalla = new Dashboard();
     }

@@ -1,4 +1,4 @@
-package org.banco.logica;
+package org.banco.servicios;
 
 import javax.swing.JLabel;
 import javax.swing.table.DefaultTableModel;
@@ -56,9 +56,6 @@ public class DatosWidgets {
         String resultado = df.format(valor) + SUFIJOS[indiceSufijos];
 
         return negativo ? "-" + resultado : resultado;
-
-
-
     }
     
     public void ponerUltimosClientesTabla(DefaultTableModel dtm) {

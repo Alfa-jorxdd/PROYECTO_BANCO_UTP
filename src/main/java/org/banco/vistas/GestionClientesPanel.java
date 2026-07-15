@@ -1,15 +1,19 @@
 package org.banco.vistas;
 
+import com.formdev.flatlaf.FlatClientProperties;
+import com.formdev.flatlaf.extras.FlatSVGIcon;
+import java.awt.Color;
 import java.awt.Window;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 import org.banco.enums.Formato;
-import org.banco.logica.mantenimiento.MantenimientoCliente;
+import org.banco.servicios.mantenimiento.MantenimientoCliente;
 
 public final class GestionClientesPanel extends javax.swing.JPanel {
 
@@ -17,10 +21,12 @@ public final class GestionClientesPanel extends javax.swing.JPanel {
     private final MantenimientoCliente mc;
     private boolean ascendente = true;
 
-    public GestionClientesPanel() {
+    private final Dashboard dashboard;
+    public GestionClientesPanel(Dashboard dashboard) {
         initComponents();
         dtm = (DefaultTableModel) tClientes.getModel();
         mc = new MantenimientoCliente();
+        this.dashboard = dashboard;
 
         listarClientesTabla();
         initStyles();
@@ -46,6 +52,48 @@ public final class GestionClientesPanel extends javax.swing.JPanel {
     //Inicializa todos los estilos Flatlaf
     private void initStyles() {
         tClientes.setShowVerticalLines(true);
+        
+        FlatSVGIcon buscarIcon = new FlatSVGIcon("svg/search.svg", 16, 16);
+        Color colorNaranja = UIManager.getColor("Component.focusColor");
+        buscarIcon.setColorFilter(new FlatSVGIcon.ColorFilter(colorOriginal -> colorNaranja));
+        
+        //Campo para buscar
+        txtBsucarPor.putClientProperty(FlatClientProperties.STYLE, "arc: 20");
+        txtBsucarPor.putClientProperty("JTextField.leadingIcon", buscarIcon);
+        txtBsucarPor.putClientProperty(FlatClientProperties.TEXT_FIELD_SHOW_CLEAR_BUTTON, true);
+        
+        txtBsucarPor.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, 
+            "Ingrese el " + boxBuscarPor.getSelectedItem());
+        
+        boxBuscarPor.addActionListener((e) -> {
+            
+            String nombreBusqueda = boxBuscarPor.getSelectedItem().toString();
+            txtBsucarPor.putClientProperty(
+                    FlatClientProperties.PLACEHOLDER_TEXT, 
+                    "Ingrese " + (nombreBusqueda.equals("ID") ? " el ID" : nombreBusqueda.toLowerCase().endsWith("s") ? 
+                            " los " + nombreBusqueda.toLowerCase() : 
+                            " el " + nombreBusqueda.toLowerCase()));
+            
+            txtBsucarPor.repaint();
+        }); 
+        
+        //Campos varios
+        txtNombre.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
+        txtApellidos.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
+        txtDNI.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
+        txtTelefono.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
+        txtCorreo.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
+        
+        //Botones varios
+        btnAgregar_Actualizar.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
+        btnAscDesc.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
+        btnCancelar.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
+        btnEliminar.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
+        btnReporte.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
+        
+        //JComboBoxs varios
+        boxBuscarPor.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
+        boxOrdenarPor.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
     }
 
     //Llena toda la tabla de cuentas llamando al metodo listar de la clase Mantenimiento Cliente
@@ -316,10 +364,12 @@ public final class GestionClientesPanel extends javax.swing.JPanel {
         }
         limpiarFormulario();
         listarClientesTabla();
+        dashboard.actualizarDatosDelSistema();
     }//GEN-LAST:event_btnAgregar_ActualizarActionPerformed
 
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         eliminar();
+        dashboard.actualizarDatosDelSistema();
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     private void tClientesMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tClientesMouseClicked

@@ -1,8 +1,8 @@
-package org.banco.logica;
+package org.banco.servicios;
 
 import org.banco.enums.Formato;
 import org.banco.enums.TipoReporte;
-import org.banco.modelos.Reporte;
+
 import java.io.BufferedWriter;
 
 import java.io.FileWriter;

@@ -1,11 +1,6 @@
-package org.banco.logica.mantenimiento;
+package org.banco.servicios.mantenimiento;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -19,17 +14,19 @@ import org.banco.dao.ClienteDAO;
 import org.banco.dao.CuentaDAO;
 import org.banco.dao.OperacionDAO;
 import org.banco.enums.*;
-import org.banco.logica.ReporteExcel;
-import org.banco.logica.ReporteHtml;
-import org.banco.logica.ReportePdf;
+import org.banco.servicios.Reporte;
+import org.banco.servicios.ReporteExcel;
+import org.banco.servicios.ReporteHtml;
+import org.banco.servicios.ReportePdf;
 import org.banco.modelos.*;
 import org.banco.interfaces.Operable;
+import org.banco.vistas.Voucher;
 
 public class MantenimientoOperacion implements Operable {
 
-    private CuentaDAO cuentaDAO;
-    private ClienteDAO clienteDAO;
-    private OperacionDAO operacionDAO;
+    private final CuentaDAO cuentaDAO;
+    private final ClienteDAO clienteDAO;
+    private final OperacionDAO operacionDAO;
 
     public MantenimientoOperacion() {
         cuentaDAO = new CuentaDAO();
@@ -50,10 +47,8 @@ public class MantenimientoOperacion implements Operable {
         if (!depositoValido(cuenta, montoDepositar, true)) {
             return;
         }
-        System.out.println("Monto a depositar: " + montoDepositar);
         //Realizar el deposito
         cuenta.agregarSaldo(montoDepositar);
-        System.out.println("Saldo actual de la cuenta: " + cuenta.getSaldo());
         cuentaDAO.actualizarCuenta(cuenta);
 
         Operacion nuevaOperacion = new Operacion(cuenta.getIdCuenta(), numeroCuenta, DNI, TipoOperacion.DEPOSITO, monto, monedaOperacion);

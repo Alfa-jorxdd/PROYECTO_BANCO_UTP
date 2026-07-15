@@ -1,6 +1,12 @@
 package org.banco.vistas;
 
+import com.formdev.flatlaf.FlatClientProperties;
+import com.formdev.flatlaf.extras.FlatSVGIcon;
+import java.awt.Color;
 import java.awt.Window;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
@@ -9,7 +15,7 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import javax.swing.table.DefaultTableModel;
 
-import org.banco.logica.mantenimiento.MantenimientoCuenta;
+import org.banco.servicios.mantenimiento.MantenimientoCuenta;
 import org.banco.modelos.Cliente;
 import org.banco.enums.EstadoCuenta;
 import org.banco.enums.Formato;
@@ -17,28 +23,37 @@ import org.banco.enums.Moneda;
 import org.banco.enums.TipoCuenta;
 
 import java.util.List;
+import javax.swing.ButtonModel;
 import javax.swing.JFrame;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 public class GestionCuentasPanel extends javax.swing.JPanel {
 
     private final MantenimientoCuenta mcu;
     private final DefaultListModel<String> modeloTitulares = new DefaultListModel<>();
+    private DefaultListModel<String> modeloResultados = new DefaultListModel<>();
     private final DefaultTableModel dtm;
 
     private boolean ascendente = true;
-
     private boolean habilitarActualizar = false;
-
-    public GestionCuentasPanel() {
+    
+    private final Dashboard dashboard;
+    
+    public GestionCuentasPanel(Dashboard dashboard) {
         initComponents();
         initStyles();
+        this.dashboard = dashboard;
+        JPopupMenu menu = new JPopupMenu();
+        construirPopMenu(menu);
 
         dtm = (DefaultTableModel) tCuentas.getModel();
 
         mcu = new MantenimientoCuenta();
 
-        listarCuentasTabla();
+        cargarListaCuentas();
         btnAscDesc.setText("Desc");
 
         txtBuscarTitular.getDocument().addDocumentListener(new DocumentListener() {
@@ -50,6 +65,9 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
             @Override
             public void removeUpdate(DocumentEvent e) {
                 filtrarModel();
+                if (txtBuscarTitular.getText().isEmpty()) {
+                    modeloResultados.removeAllElements();
+                }
             }
 
             @Override
@@ -59,6 +77,7 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
         });
 
         listTitulares.setModel(modeloTitulares);
+        listResultados.setModel(modeloResultados);
 
         modeloTitulares.addListDataListener(new ListDataListener() {
             @Override
@@ -80,12 +99,12 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
         txtBuscarCuenta.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                listarCuentasTabla();
+                cargarListaCuentas();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                listarCuentasTabla();
+                cargarListaCuentas();
             }
 
             @Override
@@ -93,10 +112,162 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
 
             }
         });
+
+        tCuentas.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                mostrarMenu(e);
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                mostrarMenu(e);
+            }
+
+            public void mostrarMenu(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    int fila = tCuentas.rowAtPoint(e.getPoint());
+
+                    if (fila != -1) {
+                        tCuentas.setRowSelectionInterval(fila, fila);
+                        menu.show(tCuentas, e.getX(), e.getY());
+                    }
+                }
+            }
+        });
     }
 
     private void initStyles() {
-        tCuentas.setShowVerticalLines(true);
+        FlatSVGIcon buscarIcon = new FlatSVGIcon("svg/search.svg", 16, 16);
+        FlatSVGIcon userIcon = new FlatSVGIcon("svg/user.svg", 16, 16);
+
+        Color colorNaranja = UIManager.getColor("Component.focusColor");
+        buscarIcon.setColorFilter(new FlatSVGIcon.ColorFilter(colorOriginal -> colorNaranja));
+        userIcon.setColorFilter(new FlatSVGIcon.ColorFilter(colorOriginal -> colorNaranja));
+
+        //Campo Buscar titular
+        txtBuscarTitular.putClientProperty("JTextField.leadingIcon", userIcon);
+        txtBuscarTitular.putClientProperty(FlatClientProperties.STYLE, "arc: 20");
+        txtBuscarTitular.putClientProperty(FlatClientProperties.TEXT_FIELD_SHOW_CLEAR_BUTTON, true);
+        txtBuscarTitular.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT, "Ingrese un cliente");
+
+        //Campo Buscar Cuenta
+        txtBuscarCuenta.putClientProperty("JTextField.leadingIcon", buscarIcon);
+        txtBuscarCuenta.putClientProperty(FlatClientProperties.STYLE, "arc: 30");
+        txtBuscarCuenta.putClientProperty(FlatClientProperties.TEXT_FIELD_SHOW_CLEAR_BUTTON, true);
+
+        txtBuscarCuenta.putClientProperty(FlatClientProperties.PLACEHOLDER_TEXT,
+                "Ingrese el " + boxBuscarPor.getSelectedItem());
+
+        //ComboBox 
+        boxBuscarPor.putClientProperty(FlatClientProperties.STYLE, "arc: 20");
+        boxBuscarPor.addActionListener((e) -> {
+
+            String nombreBusqueda = boxBuscarPor.getSelectedItem().toString();
+            txtBuscarCuenta.putClientProperty(
+                    FlatClientProperties.PLACEHOLDER_TEXT,
+                    "Ingrese " + (nombreBusqueda.equals("ID")
+                    ? "el ID" : nombreBusqueda.endsWith("a")
+                    ? "la " + nombreBusqueda.toLowerCase() : nombreBusqueda.toLowerCase().endsWith("s")
+                    ? "los " + nombreBusqueda.toLowerCase()
+                    : "el " + nombreBusqueda.toLowerCase()));
+
+            txtBuscarCuenta.repaint();
+        });
+        
+        boxOrdenarPor.putClientProperty(FlatClientProperties.STYLE, "arc: 20");
+        boxEstado.putClientProperty(FlatClientProperties.STYLE, "arc: 20");
+        boxMoneda.putClientProperty(FlatClientProperties.STYLE, "arc: 20");
+        boxTpoCuenta.putClientProperty(FlatClientProperties.STYLE, "arc: 20");
+        
+        //Botones varios
+        btnAgregar_Actualizar.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
+        btnAscDesc.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
+        btnEliminar.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
+        btnEliminarTitular.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
+        btnReporte.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
+    }
+
+    private void construirPopMenu(JPopupMenu menu) {
+
+        Color naranja = UIManager.getColor("Component.focusColor");
+        Color negro = Color.BLACK;
+        FlatSVGIcon iconoDepositoNaranja = new FlatSVGIcon("svg/deposit.svg", 16, 16);
+        FlatSVGIcon iconoDepositoNegro = new FlatSVGIcon("svg/deposit.svg", 16, 16);
+        FlatSVGIcon iconoRetiroNaranja = new FlatSVGIcon("svg/withdrawal.svg", 16, 16);
+        FlatSVGIcon iconoRetiroNegro = new FlatSVGIcon("svg/withdrawal.svg", 16, 16);
+        FlatSVGIcon iconoConsultaNaranja = new FlatSVGIcon("svg/consultation.svg", 16, 16);
+        FlatSVGIcon iconoConsultaNegro = new FlatSVGIcon("svg/consultation.svg", 16, 16);
+        
+        iconoRetiroNaranja.setColorFilter(new FlatSVGIcon.ColorFilter(colorOriginal -> naranja));
+        iconoConsultaNaranja.setColorFilter(new FlatSVGIcon.ColorFilter(colorOriginal -> naranja));
+        iconoDepositoNaranja.setColorFilter(new FlatSVGIcon.ColorFilter(colorOriginal -> naranja));
+        iconoDepositoNegro.setColorFilter(new FlatSVGIcon.ColorFilter(colorOriginal -> negro));
+        iconoRetiroNegro.setColorFilter(new FlatSVGIcon.ColorFilter(colorOriginal -> negro));
+        iconoConsultaNegro.setColorFilter(new FlatSVGIcon.ColorFilter(colorOriginal -> negro));
+        
+        JMenuItem irDeposito = new JMenuItem("Depositar", iconoDepositoNaranja);
+        JMenuItem irRetiro = new JMenuItem("Retirar", iconoRetiroNaranja);
+        JMenuItem irConsulta = new JMenuItem("Consultar", iconoConsultaNaranja);
+
+        menu.add(irDeposito);
+        menu.add(irRetiro);
+        menu.add(irConsulta);
+        
+        irDeposito.addActionListener((e) -> {
+            String numeroCuenta = obtenerCuentaSeleccionada();
+            this.dashboard.irADeposito(numeroCuenta);
+        });
+        
+        irRetiro.addActionListener((e) -> {
+            String numeroCuenta = obtenerCuentaSeleccionada();
+            this.dashboard.irRetiro(numeroCuenta);
+        });
+        
+        irConsulta.addActionListener((e) -> {
+            String numeroCuenta = obtenerCuentaSeleccionada();
+            this.dashboard.irConsulta(numeroCuenta);
+        });
+        
+        irDeposito.addChangeListener((e) -> {
+            ButtonModel model = irDeposito.getModel();
+            
+            if (model.isArmed()) {
+                irDeposito.setIcon(iconoDepositoNegro);
+            } else {
+                irDeposito.setIcon(iconoDepositoNaranja);
+            }
+        });
+        
+        irRetiro.addChangeListener((e) -> {
+            ButtonModel model = irRetiro.getModel();
+            
+            if (model.isArmed()) {
+                irRetiro.setIcon(iconoRetiroNegro);
+            } else {
+                irRetiro.setIcon(iconoRetiroNaranja);
+            }
+        });
+        
+        irConsulta.addChangeListener((e) -> {
+            ButtonModel model = irConsulta.getModel();
+            
+            if (model.isArmed()) {
+                irConsulta.setIcon(iconoConsultaNegro);
+            } else {
+                irConsulta.setIcon(iconoConsultaNaranja);
+            }
+        });
+    }
+
+    private String obtenerCuentaSeleccionada() {
+        int fila = tCuentas.getSelectedRow();
+        if (fila == -1) {
+            return null;
+        }
+        String numeroCuenta = dtm.getValueAt(fila, 3).toString();
+        
+        return numeroCuenta;
     }
 
     //Desactiva el JComboBox de TipoCuenta si hay más de un elemento en el modelTitulares
@@ -120,7 +291,8 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
     private void filtrarModel() {
         String texto = txtBuscarTitular.getText().trim();
         DefaultListModel<String> resultados = mcu.filtrarTitulares(texto);
-        listResultados.setModel(resultados);
+        modeloResultados = resultados;
+        listResultados.setModel(modeloResultados);
     }
 
     //Devuelte true si todos los campos no están vacíos
@@ -139,18 +311,20 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
     }
 
     //Llena toda la tabla de cuentas llamando al metodo listar de la clase Mantenimiento Cuenta
-    private void listarCuentasTabla() {
+    public void cargarListaCuentas() {
         mcu.listar(dtm, ascendente, boxOrdenarPor.getSelectedIndex(), boxBuscarPor.getSelectedIndex(), txtBuscarCuenta.getText());
     }
 
     //Limpia todos los campos del formulario
     private void limpiarFormulario() {
+        txtBuscarTitular.setText("");
         modeloTitulares.removeAllElements();
+        modeloResultados.removeAllElements();
         boxTpoCuenta.setSelectedIndex(0);
         boxEstado.setSelectedIndex(0);
         boxMoneda.setSelectedIndex(0);
-        txtBuscarTitular.setText("");
         btnAgregar_Actualizar.setText("Agregar");
+
     }
 
     //Agrega o actualiza la lista de cuenta y cliente_cuenta según los campos en el formulario
@@ -182,7 +356,7 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
             mcu.setIdCuenta(idCuenta);
             mcu.eliminar();
 
-            listarCuentasTabla();
+            cargarListaCuentas();
 
         } else {
             JOptionPane.showMessageDialog(null, "Por favor, elija una cuenta primero", "Error al eliminar", JOptionPane.WARNING_MESSAGE);
@@ -287,10 +461,10 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
         jPanel1.add(btnAgregar_Actualizar, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 90, 90, 30));
 
         boxTpoCuenta.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Niguno", "Ahorro", "Corriente", "Mancomunada" }));
-        jPanel1.add(boxTpoCuenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 30, 100, 20));
+        jPanel1.add(boxTpoCuenta, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 30, 100, 22));
 
         boxEstado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ninguno", "ACTIVA", "BLOQUEADA" }));
-        jPanel1.add(boxEstado, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 30, -1, -1));
+        jPanel1.add(boxEstado, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 30, 100, 22));
 
         btnReporte.setText("Reporte");
         btnReporte.addActionListener(new java.awt.event.ActionListener() {
@@ -304,7 +478,7 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
         jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 10, -1, -1));
 
         boxMoneda.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Ninguno", "SOL", "DOLAR" }));
-        jPanel1.add(boxMoneda, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 30, 100, -1));
+        jPanel1.add(boxMoneda, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 30, 100, 22));
         jPanel1.add(txtBuscarTitular, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 30, 190, -1));
 
         listResultados.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
@@ -387,6 +561,7 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
     //Elimina una cuenta seleccionada tanto de la lista de cuentas como de la tabla
     private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
         eliminar();
+        dashboard.actualizarDatosDelSistema();
     }//GEN-LAST:event_btnEliminarActionPerformed
 
     //Agregar el elemento seleccionado de la listaResultados a la listaTiturares
@@ -412,7 +587,7 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
     private void btnEliminarTitularActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarTitularActionPerformed
         int indice = listTitulares.getSelectedIndex();
         if (indice != -1) {
-            if (boxTpoCuenta.getSelectedIndex() != 3){
+            if (boxTpoCuenta.getSelectedIndex() != 3) {
                 modeloTitulares.removeElementAt(indice);
             }
         }
@@ -431,7 +606,8 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
 
         txtBuscarTitular.setEnabled(true);
         limpiarFormulario();
-        listarCuentasTabla();
+        cargarListaCuentas();
+        dashboard.actualizarDatosDelSistema();
     }//GEN-LAST:event_btnAgregar_ActualizarActionPerformed
 
     //Agrega los datos de una cuenta seleccionada a los campos existentes para su posterior actualización
@@ -458,7 +634,7 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
             int indexMoneda = moneda.ordinal() + 1;
             boxMoneda.setSelectedIndex(indexMoneda);
 
-            if (tipoCuenta != TipoCuenta.MANCOMUNADA){
+            if (tipoCuenta != TipoCuenta.MANCOMUNADA) {
                 txtBuscarTitular.setEnabled(false);
             }
 
@@ -469,11 +645,11 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
     private void btnAscDescActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAscDescActionPerformed
         ascendente = !ascendente;
         btnAscDesc.setText(ascendente ? "Asc" : "Desc");
-        listarCuentasTabla();
+        cargarListaCuentas();
     }//GEN-LAST:event_btnAscDescActionPerformed
 
     private void boxOrdenarPorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_boxOrdenarPorActionPerformed
-        listarCuentasTabla();
+        cargarListaCuentas();
     }//GEN-LAST:event_boxOrdenarPorActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
@@ -487,17 +663,17 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
     private void btnReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReporteActionPerformed
         Window ventanaPadre = SwingUtilities.getWindowAncestor(this);
         ReporteDialog reporteDialog = new ReporteDialog((JFrame) ventanaPadre, true);
-        
+
         if (reporteDialog.isConfirmado()) {
             String nombre = reporteDialog.getNombreArchivo();
             Formato formato = reporteDialog.getFormato();
             mcu.generarReporte(
-                    nombre
-                    , formato
-                    , ascendente
-                    , boxOrdenarPor.getSelectedIndex()
-                    , boxBuscarPor.getSelectedIndex()
-                    , txtBuscarCuenta.getText()
+                    nombre,
+                     formato,
+                     ascendente,
+                     boxOrdenarPor.getSelectedIndex(),
+                     boxBuscarPor.getSelectedIndex(),
+                     txtBuscarCuenta.getText()
             );
         }
     }//GEN-LAST:event_btnReporteActionPerformed

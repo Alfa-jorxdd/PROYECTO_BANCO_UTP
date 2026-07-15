@@ -7,24 +7,18 @@ import org.banco.enums.TipoCuenta;
 public class Cuenta_Corriente extends Cuenta{
 
     private double limiteSobregiro;
-    private double acumuladorDeSobregiro;
     private double montoLimitePorOperacion;
 
     public Cuenta_Corriente(Moneda tipoMoneda, EstadoCuenta estadoCuenta) {
         super(tipoMoneda, estadoCuenta, TipoCuenta.CORRIENTE);
-        acumuladorDeSobregiro = 0;
         convertirCamposEspecificos(tipoMoneda);
     }
 
     public Cuenta_Corriente(int idCuenta, Moneda tipoMoneda, EstadoCuenta estadoCuenta, long numeroCuenta) {
         super(idCuenta, TipoCuenta.CORRIENTE, tipoMoneda, estadoCuenta, numeroCuenta);
-        acumuladorDeSobregiro = 0;
         convertirCamposEspecificos(tipoMoneda);
     }
 
-    public void acumulacionDeSobregiro(double monto){
-        this.acumuladorDeSobregiro += monto;
-    }
     public double getLimiteSobregiro() {
         return limiteSobregiro;
     }

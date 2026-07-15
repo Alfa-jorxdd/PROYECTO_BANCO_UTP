@@ -1,8 +1,9 @@
-package org.banco.logica.mantenimiento;
+package org.banco.servicios.mantenimiento;
 import org.banco.enums.TipoReporte;
-import org.banco.logica.ReporteExcel;
-import org.banco.logica.ReporteHtml;
-import org.banco.logica.ReportePdf;
+import org.banco.servicios.Reporte;
+import org.banco.servicios.ReporteExcel;
+import org.banco.servicios.ReporteHtml;
+import org.banco.servicios.ReportePdf;
 import org.banco.modelos.*;
 
 import javax.swing.table.DefaultTableModel;

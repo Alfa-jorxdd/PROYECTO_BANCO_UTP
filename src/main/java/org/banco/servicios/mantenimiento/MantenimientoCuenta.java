@@ -1,4 +1,4 @@
-package org.banco.logica.mantenimiento;
+package org.banco.servicios.mantenimiento;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
@@ -6,6 +6,7 @@ import javax.swing.JOptionPane;
 import org.banco.dao.ClienteDAO;
 import org.banco.dao.Cliente_CuentaDAO;
 import org.banco.dao.CuentaDAO;
+import org.banco.servicios.Reporte;
 import org.banco.modelos.*;
 
 import javax.swing.table.DefaultTableModel;
@@ -14,19 +15,18 @@ import org.banco.enums.Moneda;
 import org.banco.enums.TipoCuenta;
 import org.banco.interfaces.Gestionable;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.banco.enums.Formato;
 import org.banco.enums.TipoReporte;
-import org.banco.logica.ReporteExcel;
-import org.banco.logica.ReporteHtml;
-import org.banco.logica.ReportePdf;
+import org.banco.servicios.ReporteExcel;
+import org.banco.servicios.ReporteHtml;
+import org.banco.servicios.ReportePdf;
 
 public class MantenimientoCuenta implements Gestionable {
 
-    private CuentaDAO cuentaDAO;
-    private ClienteDAO clienteDAO;
-    private Cliente_CuentaDAO cliente_cuentaDAO;
+    private final CuentaDAO cuentaDAO;
+    private final ClienteDAO clienteDAO;
+    private final Cliente_CuentaDAO cliente_cuentaDAO;
     private int[] idClientes;
     private int idCuenta;
     private TipoCuenta tipoCuenta;
@@ -57,8 +57,6 @@ public class MantenimientoCuenta implements Gestionable {
 
         cuentaDAO.agregarCuenta(nuevaCue);
         int idCuenta = nuevaCue.getIdCuenta();
-        System.out.println("MANTENIMIENTO");
-        System.out.println(idCuenta);
         for (int idCliente : idClientes) {
             cliente_cuentaDAO.agregarCliente_Cuenta(idCliente, idCuenta);
         }

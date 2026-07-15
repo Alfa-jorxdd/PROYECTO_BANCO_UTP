@@ -151,7 +151,7 @@
                     <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
                       <Font name="Segoe UI" size="12" style="1"/>
                     </Property>
-                    <Property name="text" type="java.lang.String" value="&#xa1;Bienvenido!     &gt; "/>
+                    <Property name="text" type="java.lang.String" value="&#xa1;Bienvenido!    &gt; "/>
                   </Properties>
                 </Component>
                 <Component class="javax.swing.JLabel" name="txtFecha">
@@ -182,9 +182,11 @@
             <Component class="javax.swing.JButton" name="btnInicio">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Inicio"/>
+                <Property name="toolTipText" type="java.lang.String" value=""/>
                 <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
                   <Border info="null"/>
                 </Property>
+                <Property name="horizontalTextPosition" type="int" value="4"/>
               </Properties>
               <Events>
                 <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnInicioActionPerformed"/>

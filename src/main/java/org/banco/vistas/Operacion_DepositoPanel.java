@@ -1,11 +1,11 @@
 package org.banco.vistas;
 
+import com.formdev.flatlaf.FlatClientProperties;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.banco.logica.mantenimiento.MantenimientoOperacion;
-import org.banco.modelos.Banco;
+import org.banco.servicios.mantenimiento.MantenimientoOperacion;
 import org.banco.enums.Moneda;
 
 public class Operacion_DepositoPanel extends javax.swing.JPanel {
@@ -14,11 +14,12 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
     private final DefaultListModel<String> modeloResultadosDNI = new DefaultListModel<>();
 
     private final MantenimientoOperacion mo;
-
-    public Operacion_DepositoPanel() {
+    private OperacionPanel operacionPanel;
+    
+    public Operacion_DepositoPanel(OperacionPanel operacionPanel) {
         initComponents();
         InitStyles();
-
+        this.operacionPanel = operacionPanel;
         this.mo = new MantenimientoOperacion();
 
         listNumeroCuenta.setModel(modeloResultadosCuenta);
@@ -63,6 +64,7 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
     }
     private void InitStyles() {
         labelDeposito.putClientProperty("FlatLaf.styleClass", "h0");
+        btnDepositar.putClientProperty(FlatClientProperties.STYLE, "arc: 30");
     }
 
     private boolean formulariosLlenos() {
@@ -97,6 +99,10 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
         txtDNI.setText("");
         txtMonto.setText("");
         boxTipoMoneda.setSelectedIndex(0);
+    }
+    
+    public void ingresarNumeroCuenta(String numeroCuenta){
+        txtNumeroCuenta.setText(numeroCuenta);
     }
 
     @SuppressWarnings("unchecked")
@@ -295,6 +301,7 @@ public class Operacion_DepositoPanel extends javax.swing.JPanel {
         mo.depositar(numeroCuenta, monto, monedaOperacion, DNI);
 
         limpiarFormularios();
+        operacionPanel.getDashboard().actualizarDatosDelSistema();
     }
 
 

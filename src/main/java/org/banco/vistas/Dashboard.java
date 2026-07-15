@@ -1,16 +1,25 @@
 package org.banco.vistas;
 
+import com.formdev.flatlaf.FlatClientProperties;
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 import org.banco.config.ConexionSQLServer;
 import org.netbeans.lib.awtextra.AbsoluteConstraints;
 
 public final class Dashboard extends javax.swing.JFrame {
 
     private final TopBar topBar;
+
+    private final Principal principal;
+    private final GestionClientesPanel clientes;
+    private final GestionCuentasPanel cuentas;
+    private final OperacionPanel operaciones;
 
     public Dashboard() {
         initComponents();
@@ -20,46 +29,89 @@ public final class Dashboard extends javax.swing.JFrame {
 
         int widthPanel = 1120;
         int heightPanel = 30;
-        bg.add(topBar, new AbsoluteConstraints(0,0, widthPanel, heightPanel));
+        bg.add(topBar, new AbsoluteConstraints(0, 0, widthPanel, heightPanel));
         bg.setComponentZOrder(topBar, 1);
-        
+
         this.setVisible(true);
         this.setLocationRelativeTo(null);
-        
+
         mostrarPanel(new Principal(), "Inicio");
         mostrarFecha();
-        
+
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             ConexionSQLServer.getInstancia().cerrarConexion();
         }));
+
+        principal = new Principal();
+        clientes = new GestionClientesPanel(this);
+        cuentas = new GestionCuentasPanel(this);
+        operaciones = new OperacionPanel(this);
     }
-    
-    private void mostrarPanel(JPanel panel, String titulo){
+
+    private void mostrarPanel(JPanel panel, String titulo) {
         panel.setSize(799, 435);
-        panel.setLocation(0,0);
-       
+        panel.setLocation(0, 0);
+
         panelMain.removeAll();
         panelMain.add(panel, BorderLayout.CENTER);
         panelMain.revalidate();
         panelMain.repaint();
-        
+
         txtTitulo.setText(titulo);
     }
 
-    private void initStyles(){ 
-        panelOptions.putClientProperty("FlatLaf.style", "arc: 50");
-        panelDashboard.putClientProperty("FlatLaf.style", "arc: 50");
-        txtBienvenida.putClientProperty( "FlatLaf.styleClass", "h0");
-        txtTitulo.putClientProperty("FlatLaf.styleClass", "h0");
-        txtFecha.putClientProperty( "FlatLaf.styleClass", "h3" );
+    private void initStyles() {
+        panelOptions.putClientProperty(FlatClientProperties.STYLE_CLASS, "arc: 50");
+        panelDashboard.putClientProperty(FlatClientProperties.STYLE_CLASS, "arc: 50");
+        txtBienvenida.putClientProperty(FlatClientProperties.STYLE_CLASS, "h0");
+        txtTitulo.putClientProperty(FlatClientProperties.STYLE_CLASS, "h0");
+        txtFecha.putClientProperty(FlatClientProperties.STYLE_CLASS, "h3");
+        
+        FlatSVGIcon pricipalIcon = new FlatSVGIcon("svg/dashboard.svg", 16, 16);
+        FlatSVGIcon clienteIcon = new FlatSVGIcon("svg/client.svg", 16, 16);
+        FlatSVGIcon cuentaIcon = new FlatSVGIcon("svg/account.svg", 16, 16);
+        FlatSVGIcon operacionIcon = new FlatSVGIcon("svg/card.svg", 16, 16);
+
+        Color colorNaranja = UIManager.getColor("Component.focusColor");
+        
+        pricipalIcon.setColorFilter(new FlatSVGIcon.ColorFilter(colorOriginal -> colorNaranja));
+        clienteIcon.setColorFilter(new FlatSVGIcon.ColorFilter(colorOriginal -> colorNaranja));
+        cuentaIcon.setColorFilter(new FlatSVGIcon.ColorFilter(colorOriginal -> colorNaranja));
+        operacionIcon.setColorFilter(new FlatSVGIcon.ColorFilter(colorOriginal -> colorNaranja));
+        
+        //Botones
+        btnInicio.setIcon(pricipalIcon);
+        btnGestionClientes.setIcon(clienteIcon);
+        btnGestionCuentas.setIcon(cuentaIcon);
+        btnOperaciones.setIcon(operacionIcon);
     }
-    
-    private void mostrarFecha(){
+
+    private void mostrarFecha() {
         LocalDate fechaDeHoy = LocalDate.now();
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd MMM yyyy", new Locale("es", "PE"));
         txtFecha.setText(formato.format(fechaDeHoy));
     }
+
+    public void irADeposito(String numeroCuenta) {
+        mostrarPanel(operaciones, "Operaciones");
+        operaciones.irDeposito(numeroCuenta);
+    }
     
+    public void irRetiro(String numeroCuenta) {
+        mostrarPanel(operaciones, "Operaciones");
+        operaciones.irRetiro(numeroCuenta);
+    }
+    
+    public void irConsulta(String numeroCuenta) {
+        mostrarPanel(operaciones, "Operaciones");
+        operaciones.irConsulta(numeroCuenta);
+    }
+    
+    public void actualizarDatosDelSistema(){
+        cuentas.cargarListaCuentas();
+        principal.cargarDatosWidgets();
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -104,7 +156,7 @@ public final class Dashboard extends javax.swing.JFrame {
         );
 
         txtBienvenida.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        txtBienvenida.setText("¡Bienvenido!     > ");
+        txtBienvenida.setText("¡Bienvenido!    > ");
 
         txtFecha.setText("30 abr. 2026");
 
@@ -163,7 +215,9 @@ public final class Dashboard extends javax.swing.JFrame {
         panelOptions.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         btnInicio.setText("Inicio");
+        btnInicio.setToolTipText("");
         btnInicio.setBorder(null);
+        btnInicio.setHorizontalTextPosition(javax.swing.SwingConstants.RIGHT);
         btnInicio.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnInicioActionPerformed(evt);
@@ -237,19 +291,19 @@ public final class Dashboard extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnInicioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnInicioActionPerformed
-        mostrarPanel(new Principal(), "Inicio");
+        mostrarPanel(principal, "Inicio");
     }//GEN-LAST:event_btnInicioActionPerformed
-    
+
     private void btnGestionClientesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGestionClientesActionPerformed
-        mostrarPanel(new GestionClientesPanel(), "Gestión de Clientes");
+        mostrarPanel(clientes, "Gestión de Clientes");
     }//GEN-LAST:event_btnGestionClientesActionPerformed
-    
+
     private void btnGestionCuentasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGestionCuentasActionPerformed
-        mostrarPanel(new GestionCuentasPanel(), "Gestión de Cuentas");
+        mostrarPanel(cuentas, "Gestión de Cuentas");
     }//GEN-LAST:event_btnGestionCuentasActionPerformed
-    
+
     private void btnOperacionesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnOperacionesActionPerformed
-        mostrarPanel(new OperacionPanel(), "Operaciones");
+        mostrarPanel(operaciones, "Operaciones");
     }//GEN-LAST:event_btnOperacionesActionPerformed
 
 

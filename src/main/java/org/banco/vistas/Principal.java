@@ -1,8 +1,7 @@
 package org.banco.vistas;
 
 import javax.swing.table.DefaultTableModel;
-import org.banco.logica.DatosWidgets;
-import org.banco.modelos.Banco;
+import org.banco.servicios.DatosWidgets;
 
 public final class Principal extends javax.swing.JPanel {
 
@@ -29,10 +28,18 @@ public final class Principal extends javax.swing.JPanel {
         txtOperaciones.putClientProperty("FlatLaf.styleClass", "h3");
         txtSaldo.putClientProperty("FlatLaf.styleClass", "h3");
         tClientesRecientes.setShowVerticalLines(true);
+        
+        widClientes.putClientProperty("FlatLaf.style", "arc: 30");
+        widCuentas.putClientProperty("FlatLaf.style", "arc: 30");
+        widOperaciones.putClientProperty("FlatLaf.style", "arc: 30");
+        widSaldo.putClientProperty("FlatLaf.style", "arc: 30");
+        btnSimboloPanel.putClientProperty("FlatLaf.style", "arc: 70");
+        
+        tClientesRecientes.putClientProperty("Table.alternateRowColor", true);
 
     }
 
-    private void cargarDatosWidgets() {
+    public void cargarDatosWidgets() {
         dw.cargarClientesWidgets(labelNumClientes);
         dw.cargarCuentasWidgets(labelNumCuentas);
         dw.cargarOperacionesWidgets(labelNumOperaciones);
@@ -76,6 +83,7 @@ public final class Principal extends javax.swing.JPanel {
         setLayout(null);
 
         widCuentas.setBackground(new java.awt.Color(245, 121, 0));
+        widCuentas.setPreferredSize(new java.awt.Dimension(155, 145));
 
         label.setForeground(new java.awt.Color(0, 0, 0));
         label.setText("Total de cuentas");
@@ -84,7 +92,8 @@ public final class Principal extends javax.swing.JPanel {
         labelNumCuentas.setForeground(new java.awt.Color(51, 51, 51));
         labelNumCuentas.setText("28");
 
-        jLabel2.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel2.setBackground(new java.awt.Color(0, 0, 0));
+        jLabel2.setForeground(new java.awt.Color(0, 0, 0));
         jLabel2.setText("Registrados");
 
         javax.swing.GroupLayout widCuentasLayout = new javax.swing.GroupLayout(widCuentas);
@@ -97,17 +106,17 @@ public final class Principal extends javax.swing.JPanel {
                     .addComponent(label, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(widCuentasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                         .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 82, Short.MAX_VALUE)
-                        .addComponent(labelNumCuentas, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(labelNumCuentas, javax.swing.GroupLayout.Alignment.LEADING)))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
         widCuentasLayout.setVerticalGroup(
             widCuentasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(widCuentasLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(label, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(labelNumCuentas, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
+                .addComponent(labelNumCuentas, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jLabel2)
                 .addContainerGap(16, Short.MAX_VALUE))
         );
@@ -132,7 +141,6 @@ public final class Principal extends javax.swing.JPanel {
             }
         });
 
-        labelSimbolo.setBackground(new java.awt.Color(245, 121, 0));
         labelSimbolo.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         labelSimbolo.setForeground(new java.awt.Color(51, 51, 51));
         labelSimbolo.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
@@ -143,11 +151,16 @@ public final class Principal extends javax.swing.JPanel {
         btnSimboloPanel.setLayout(btnSimboloPanelLayout);
         btnSimboloPanelLayout.setHorizontalGroup(
             btnSimboloPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(labelSimbolo, javax.swing.GroupLayout.DEFAULT_SIZE, 37, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnSimboloPanelLayout.createSequentialGroup()
+                .addContainerGap(17, Short.MAX_VALUE)
+                .addComponent(labelSimbolo)
+                .addGap(14, 14, 14))
         );
         btnSimboloPanelLayout.setVerticalGroup(
             btnSimboloPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(labelSimbolo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, btnSimboloPanelLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(labelSimbolo))
         );
 
         javax.swing.GroupLayout widSaldoLayout = new javax.swing.GroupLayout(widSaldo);
@@ -155,16 +168,18 @@ public final class Principal extends javax.swing.JPanel {
         widSaldoLayout.setHorizontalGroup(
             widSaldoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, widSaldoLayout.createSequentialGroup()
-                .addGap(0, 17, Short.MAX_VALUE)
+                .addGap(20, 20, 20)
+                .addComponent(txtSaldo)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(btnSimboloPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, widSaldoLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
                 .addGroup(widSaldoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(labelNumSaldo, javax.swing.GroupLayout.PREFERRED_SIZE, 139, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, widSaldoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, widSaldoLayout.createSequentialGroup()
-                            .addComponent(txtSaldo, javax.swing.GroupLayout.PREFERRED_SIZE, 95, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                            .addComponent(btnSimboloPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addComponent(jLabel3)))
-                .addContainerGap())
+                    .addGroup(widSaldoLayout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addComponent(jLabel3))
+                    .addComponent(labelNumSaldo, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(16, 16, 16))
         );
         widSaldoLayout.setVerticalGroup(
             widSaldoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -195,18 +210,21 @@ public final class Principal extends javax.swing.JPanel {
         widOperacionesLayout.setHorizontalGroup(
             widOperacionesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(widOperacionesLayout.createSequentialGroup()
-                .addGap(23, 23, 23)
                 .addGroup(widOperacionesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(labelNumOperaciones, javax.swing.GroupLayout.PREFERRED_SIZE, 74, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtOperaciones, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(16, Short.MAX_VALUE))
+                    .addGroup(widOperacionesLayout.createSequentialGroup()
+                        .addGap(23, 23, 23)
+                        .addComponent(labelNumOperaciones))
+                    .addGroup(widOperacionesLayout.createSequentialGroup()
+                        .addGap(15, 15, 15)
+                        .addComponent(txtOperaciones, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(24, Short.MAX_VALUE))
         );
         widOperacionesLayout.setVerticalGroup(
             widOperacionesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(widOperacionesLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(txtOperaciones, javax.swing.GroupLayout.PREFERRED_SIZE, 27, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addGap(12, 12, 12)
                 .addComponent(labelNumOperaciones, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -232,9 +250,9 @@ public final class Principal extends javax.swing.JPanel {
             .addGroup(widClientesLayout.createSequentialGroup()
                 .addGap(20, 20, 20)
                 .addGroup(widClientesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1)
                     .addComponent(labelClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(labelNumClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 102, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jLabel1)
+                    .addComponent(labelNumClientes))
                 .addContainerGap(19, Short.MAX_VALUE))
         );
         widClientesLayout.setVerticalGroup(
@@ -257,7 +275,7 @@ public final class Principal extends javax.swing.JPanel {
                 {null, null, null, null}
             },
             new String [] {
-                "ID", " Nombres", "Apellidos", "Tipo Cuenta"
+                "ID", " Nombres", "Tipo Cuenta", "Estado"
             }
         ) {
             boolean[] canEdit = new boolean [] {
@@ -283,22 +301,19 @@ public final class Principal extends javax.swing.JPanel {
                     .addComponent(widClientes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, Short.MAX_VALUE)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(widSaldo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(widCuentas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                    .addComponent(widCuentas, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(widSaldo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(24, 24, 24)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(txtTitulo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jscrollUltimosClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 420, Short.MAX_VALUE))
-                .addGap(110, 110, 110))
+                    .addComponent(jscrollUltimosClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 405, Short.MAX_VALUE)
+                    .addComponent(txtTitulo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(125, 125, 125))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(21, Short.MAX_VALUE)
-                .addComponent(txtTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jscrollUltimosClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 343, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(64, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(widCuentas, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -306,13 +321,16 @@ public final class Principal extends javax.swing.JPanel {
                         .addGap(22, 22, 22)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(widSaldo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(widOperaciones, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(17, 17, 17)))
-                .addGap(36, 36, 36))
+                            .addComponent(widOperaciones, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(txtTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jscrollUltimosClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 273, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(53, 53, 53))
         );
 
         add(jPanel1);
-        jPanel1.setBounds(0, 0, 905, 435);
+        jPanel1.setBounds(0, 0, 800, 435);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnSimboloPanelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btnSimboloPanelMouseClicked

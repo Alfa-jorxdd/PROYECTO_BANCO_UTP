@@ -1,21 +1,23 @@
 package org.banco.vistas;
 
+import com.formdev.flatlaf.FlatClientProperties;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import org.banco.logica.mantenimiento.MantenimientoOperacion;
-import org.banco.modelos.Banco;
+import org.banco.servicios.mantenimiento.MantenimientoOperacion;
 
 public class Operacion_ConsultaPanel extends javax.swing.JPanel {
 
-    private DefaultListModel<String> modeloResultadosCuenta = new DefaultListModel<>();
+    private final DefaultListModel<String> modeloResultadosCuenta = new DefaultListModel<>();
     
-    private MantenimientoOperacion mo;
+    private final MantenimientoOperacion mo;
+    private final OperacionPanel operacionPanel;
 
-    public Operacion_ConsultaPanel() {
+    public Operacion_ConsultaPanel(OperacionPanel operacionPanel) {
         initComponents();
         InitStyles();
+        this.operacionPanel = operacionPanel;
         mo  = new MantenimientoOperacion();
         listNumeroCuenta.setModel(modeloResultadosCuenta);
 
@@ -42,6 +44,9 @@ public class Operacion_ConsultaPanel extends javax.swing.JPanel {
 
     private void InitStyles() {
         labelDeposito.putClientProperty("FlatLaf.styleClass", "h0");
+        
+        //Botón
+        btnDepositar.putClientProperty(FlatClientProperties.STYLE, "arc: 30");
     }
     
     private boolean numeroDeCuentaValido(){
@@ -54,6 +59,10 @@ public class Operacion_ConsultaPanel extends javax.swing.JPanel {
             return false;
         }
         return true;
+    }
+    
+    public void ingresarNumeroCuenta(String numeroCuenta){
+        txtNumeroCuenta.setText(numeroCuenta);
     }
 
     @SuppressWarnings("unchecked")
@@ -173,6 +182,7 @@ public class Operacion_ConsultaPanel extends javax.swing.JPanel {
         mo.consultar(numeroCuenta);
         
         txtNumeroCuenta.setText("");
+        operacionPanel.getDashboard().actualizarDatosDelSistema();
     }
 
 
