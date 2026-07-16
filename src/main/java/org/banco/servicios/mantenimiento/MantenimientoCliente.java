@@ -48,7 +48,7 @@ public class MantenimientoCliente implements Gestionable {
     public void listar(DefaultTableModel dtm, boolean ascendente, int criterioOrden, int criterioFiltrar, String textoFiltrado) {
         clienteDao.listarClientes(dtm, ascendente, criterioOrden, criterioFiltrar, textoFiltrado);
     }
-    
+
     public void generarReporte(String nombre, Formato formato, boolean ascendente, int criterioOrden, int criterioFiltrar, String textoFiltrado){
         Reporte nuevoReporte = null;
         switch(formato){
@@ -72,7 +72,6 @@ public class MantenimientoCliente implements Gestionable {
         this.dni = DNI;
         this.telefono = telefono;
         this.correo = correo;
-
     }
 
     public void setIdCliente(int idCliente) {

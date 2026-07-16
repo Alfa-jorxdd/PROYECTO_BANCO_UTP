@@ -34,13 +34,10 @@ public class CuentaDAO {
                 cs.registerOutParameter(7, Types.INTEGER);
 
                 cs.executeUpdate();
-                System.out.println("Hay hasta aquí? 111");
                 if (cs.getInt(6) == 1) {
                     cuenta.cambiarNumeroCuenta();
                 } else {
                     cuenta.setIdCuenta(cs.getInt(7));
-                    System.out.println("DAO");
-                    System.out.println(cuenta.getIdCuenta());
                     break;
                 }
             } catch (SQLException e) {

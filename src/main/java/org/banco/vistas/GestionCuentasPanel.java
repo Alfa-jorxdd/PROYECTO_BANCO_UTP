@@ -39,9 +39,9 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
 
     private boolean ascendente = true;
     private boolean habilitarActualizar = false;
-    
+
     private final Dashboard dashboard;
-    
+
     public GestionCuentasPanel(Dashboard dashboard) {
         initComponents();
         initStyles();
@@ -174,12 +174,12 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
 
             txtBuscarCuenta.repaint();
         });
-        
+
         boxOrdenarPor.putClientProperty(FlatClientProperties.STYLE, "arc: 20");
         boxEstado.putClientProperty(FlatClientProperties.STYLE, "arc: 20");
         boxMoneda.putClientProperty(FlatClientProperties.STYLE, "arc: 20");
         boxTpoCuenta.putClientProperty(FlatClientProperties.STYLE, "arc: 20");
-        
+
         //Botones varios
         btnAgregar_Actualizar.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
         btnAscDesc.putClientProperty(FlatClientProperties.STYLE, "arc: 10");
@@ -198,14 +198,14 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
         FlatSVGIcon iconoRetiroNegro = new FlatSVGIcon("svg/withdrawal.svg", 16, 16);
         FlatSVGIcon iconoConsultaNaranja = new FlatSVGIcon("svg/consultation.svg", 16, 16);
         FlatSVGIcon iconoConsultaNegro = new FlatSVGIcon("svg/consultation.svg", 16, 16);
-        
+
         iconoRetiroNaranja.setColorFilter(new FlatSVGIcon.ColorFilter(colorOriginal -> naranja));
         iconoConsultaNaranja.setColorFilter(new FlatSVGIcon.ColorFilter(colorOriginal -> naranja));
         iconoDepositoNaranja.setColorFilter(new FlatSVGIcon.ColorFilter(colorOriginal -> naranja));
         iconoDepositoNegro.setColorFilter(new FlatSVGIcon.ColorFilter(colorOriginal -> negro));
         iconoRetiroNegro.setColorFilter(new FlatSVGIcon.ColorFilter(colorOriginal -> negro));
         iconoConsultaNegro.setColorFilter(new FlatSVGIcon.ColorFilter(colorOriginal -> negro));
-        
+
         JMenuItem irDeposito = new JMenuItem("Depositar", iconoDepositoNaranja);
         JMenuItem irRetiro = new JMenuItem("Retirar", iconoRetiroNaranja);
         JMenuItem irConsulta = new JMenuItem("Consultar", iconoConsultaNaranja);
@@ -213,45 +213,45 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
         menu.add(irDeposito);
         menu.add(irRetiro);
         menu.add(irConsulta);
-        
+
         irDeposito.addActionListener((e) -> {
             String numeroCuenta = obtenerCuentaSeleccionada();
             this.dashboard.irADeposito(numeroCuenta);
         });
-        
+
         irRetiro.addActionListener((e) -> {
             String numeroCuenta = obtenerCuentaSeleccionada();
             this.dashboard.irRetiro(numeroCuenta);
         });
-        
+
         irConsulta.addActionListener((e) -> {
             String numeroCuenta = obtenerCuentaSeleccionada();
             this.dashboard.irConsulta(numeroCuenta);
         });
-        
+
         irDeposito.addChangeListener((e) -> {
             ButtonModel model = irDeposito.getModel();
-            
+
             if (model.isArmed()) {
                 irDeposito.setIcon(iconoDepositoNegro);
             } else {
                 irDeposito.setIcon(iconoDepositoNaranja);
             }
         });
-        
+
         irRetiro.addChangeListener((e) -> {
             ButtonModel model = irRetiro.getModel();
-            
+
             if (model.isArmed()) {
                 irRetiro.setIcon(iconoRetiroNegro);
             } else {
                 irRetiro.setIcon(iconoRetiroNaranja);
             }
         });
-        
+
         irConsulta.addChangeListener((e) -> {
             ButtonModel model = irConsulta.getModel();
-            
+
             if (model.isArmed()) {
                 irConsulta.setIcon(iconoConsultaNegro);
             } else {
@@ -266,7 +266,7 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
             return null;
         }
         String numeroCuenta = dtm.getValueAt(fila, 3).toString();
-        
+
         return numeroCuenta;
     }
 
@@ -586,11 +586,19 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
     //Eliminar el elemento seleccionado de la listaTitulares
     private void btnEliminarTitularActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarTitularActionPerformed
         int indice = listTitulares.getSelectedIndex();
-        if (indice != -1) {
-            if (boxTpoCuenta.getSelectedIndex() != 3) {
-                modeloTitulares.removeElementAt(indice);
-            }
+
+        if (indice == -1) {
+            return;
         }
+
+        if (boxTpoCuenta.getSelectedIndex() == 3 && modeloTitulares.size() <= 2) {
+            JOptionPane.showMessageDialog(this,
+                    "Una cuenta mancomunada debe tener al menos 2 titulares.",
+                    "No se puede eliminar",
+                    JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        modeloTitulares.removeElementAt(indice);
     }//GEN-LAST:event_btnEliminarTitularActionPerformed
 
     //Agrega o actualiza tanto la lista de cuentas como la tabla
@@ -669,11 +677,11 @@ public class GestionCuentasPanel extends javax.swing.JPanel {
             Formato formato = reporteDialog.getFormato();
             mcu.generarReporte(
                     nombre,
-                     formato,
-                     ascendente,
-                     boxOrdenarPor.getSelectedIndex(),
-                     boxBuscarPor.getSelectedIndex(),
-                     txtBuscarCuenta.getText()
+                    formato,
+                    ascendente,
+                    boxOrdenarPor.getSelectedIndex(),
+                    boxBuscarPor.getSelectedIndex(),
+                    txtBuscarCuenta.getText()
             );
         }
     }//GEN-LAST:event_btnReporteActionPerformed
