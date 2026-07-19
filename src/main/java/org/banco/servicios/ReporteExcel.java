@@ -29,9 +29,9 @@ public class ReporteExcel extends Reporte{
 
         String[] encabezados = obtenerEncabezados();
 
-        Row filaTitulo = pagina.createRow(filaActual++);
+        Row filaTitulo = pagina.createRow(filaActual++); //
         Cell celdaTitulo = filaTitulo.createCell(0);
-        String tipo = getTipoReporte().toString();
+        String tipo = getTipoReporte().toString(); //OPERACIONES -> Operaciones
         String tipoFormateado = tipo.charAt(0) + tipo.substring(1).toLowerCase();
         celdaTitulo.setCellValue("Reporte de " + tipoFormateado);
         celdaTitulo.setCellStyle(estiloTitulo);

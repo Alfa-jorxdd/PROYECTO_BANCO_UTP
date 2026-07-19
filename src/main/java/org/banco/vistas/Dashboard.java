@@ -61,8 +61,8 @@ public final class Dashboard extends javax.swing.JFrame {
     }
 
     private void initStyles() {
-        panelOptions.putClientProperty(FlatClientProperties.STYLE_CLASS, "arc: 50");
-        panelDashboard.putClientProperty(FlatClientProperties.STYLE_CLASS, "arc: 50");
+        panelOptions.putClientProperty(FlatClientProperties.STYLE, "arc: 50");
+        panelDashboard.putClientProperty(FlatClientProperties.STYLE, "arc: 50");
         txtBienvenida.putClientProperty(FlatClientProperties.STYLE_CLASS, "h0");
         txtTitulo.putClientProperty(FlatClientProperties.STYLE_CLASS, "h0");
         txtFecha.putClientProperty(FlatClientProperties.STYLE_CLASS, "h3");

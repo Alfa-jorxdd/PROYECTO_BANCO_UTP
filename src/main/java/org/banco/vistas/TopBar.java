@@ -67,7 +67,7 @@ public final class TopBar extends JPanel {
         MouseMotionAdapter mouseMotionAdapter = new MouseMotionAdapter() {
             @Override
             public void mouseDragged(MouseEvent e) {
-                ventana.setLocation(e.getXOnScreen() - xMouse, e.getYOnScreen() - yMouse);
+                ventana.setLocation(e.getXOnScreen() -xMouse, e.getYOnScreen()- yMouse);
             }
 
         };

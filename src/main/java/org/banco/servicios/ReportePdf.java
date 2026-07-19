@@ -49,7 +49,7 @@ public class ReportePdf extends Reporte{
             tabla.addHeaderCell(crearEstiloCeldaEncabezado(textEncabezado));
         }
 
-        tabla.setSkipFirstHeader(false);
+        tabla.setSkipFirstHeader(false); //true
 
         for (Object[] datos : lista) {
             for (Object dato : datos) {
@@ -61,11 +61,12 @@ public class ReportePdf extends Reporte{
     }
 
     private Paragraph crearTitulo() throws IOException {
-        String tipo = getTipoReporte().toString();
+        String tipo = getTipoReporte().toString(); //CLIENTES -> Clientes
         String tipoFormateado = tipo.charAt(0) + tipo.substring(1).toLowerCase();
 
         PdfFont fuenteTitulo = PdfFontFactory.createFont(StandardFonts.HELVETICA_BOLD);
 
+        //<p>Reporte Clientes</p>
         return new Paragraph("Reporte " + tipoFormateado)
                 .setFont(fuenteTitulo)
                 .setFontSize(24f)

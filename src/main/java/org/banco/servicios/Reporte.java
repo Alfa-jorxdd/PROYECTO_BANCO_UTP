@@ -15,7 +15,6 @@ public abstract class Reporte {
         this.nombre = nombre;
         this.formato = formato;
         this.tipoReporte = tipoReporte;
-        
     }
 
     protected String[] obtenerEncabezados() {
