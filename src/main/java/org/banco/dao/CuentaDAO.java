@@ -266,7 +266,7 @@ public class CuentaDAO {
             pt.setInt(1, idCuenta);
             try(ResultSet rs = pt.executeQuery()) {
                 if (rs.next()){
-                    return rs.getInt("cantidad");
+                    return rs.getInt("cantidad"); //-> 5
                 }
             }
         } catch (SQLException e){

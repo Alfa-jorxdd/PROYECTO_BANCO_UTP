@@ -124,14 +124,12 @@ public class MantenimientoCuenta implements Gestionable {
             for (int i = 0; i < localIdClientes.length; i++) {
                 int id = Integer.parseInt(modeloTitulares.getElementAt(i).split("\\.")[0]);
                 localIdClientes[i] = id;
-                System.out.println(id);
             }
             setIdClientes(localIdClientes);
         } else {
             int id = Integer.parseInt(modeloTitulares.firstElement().split("\\.")[0]);
             localIdClientes[0] = id;
             setIdClientes(localIdClientes);
-            System.out.println(id);
         }
     }
 

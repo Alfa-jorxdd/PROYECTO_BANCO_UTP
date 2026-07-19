@@ -41,7 +41,7 @@ public class MantenimientoOperacion implements Operable {
         if (!cuentaExiste(cuenta)) {
             return;
         }
-
+        //Convertir el monto
         double montoDepositar = montoSegunMoneda(monto, monedaOperacion, cuenta);
         //Validar el deposito
         if (!depositoValido(cuenta, montoDepositar, true)) {
@@ -50,7 +50,7 @@ public class MantenimientoOperacion implements Operable {
         //Realizar el deposito
         cuenta.agregarSaldo(montoDepositar);
         cuentaDAO.actualizarCuenta(cuenta);
-
+        //Voucher y registro de la operacion
         Operacion nuevaOperacion = new Operacion(cuenta.getIdCuenta(), numeroCuenta, DNI, TipoOperacion.DEPOSITO, monto, monedaOperacion);
         operacionDAO.agregarOperacion(nuevaOperacion);
         Voucher voucherOperacion = new Voucher(nuevaOperacion);
@@ -59,13 +59,13 @@ public class MantenimientoOperacion implements Operable {
 
     @Override
     public void retirar(long numeroCuenta, double monto, Moneda monedaOperacion, int DNI) {
-
+        //Obtenemos la cuenta
         Cuenta cuenta = cuentaDAO.buscarCuentaPorNumeroCuenta(numeroCuenta);
         if (!cuentaExiste(cuenta)) {
             return;
         }
+        //Convertimos el monto
         double montoRetirar = montoSegunMoneda(monto, monedaOperacion, cuenta);
-
         //Validar el retiro
         if (!retiroValido(cuenta, montoRetirar, true)) {
             return;
@@ -75,7 +75,6 @@ public class MantenimientoOperacion implements Operable {
         cuentaDAO.actualizarCuenta(cuenta);
 
         //Generar registro de la operacion y VOUCHER
-
         Operacion nuevaOperacion = new Operacion(cuenta.getIdCuenta(), numeroCuenta, DNI, TipoOperacion.RETIRO, monto, monedaOperacion);
         operacionDAO.agregarOperacion(nuevaOperacion);
         Voucher voucherOperacion = new Voucher(nuevaOperacion);
@@ -104,7 +103,7 @@ public class MantenimientoOperacion implements Operable {
             }
             return;
         }
-
+        //Obtener el monto convertido de deposito y de retiro
         double montoRetiro = montoSegunMoneda(monto, monedaOperacion, cuentaOrigen);
         double montoDeposito = montoSegunMoneda(monto, monedaOperacion, cuentaDestino);
         //Valida la transferencia

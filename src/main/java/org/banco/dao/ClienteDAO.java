@@ -172,7 +172,7 @@ public class ClienteDAO {
         try(PreparedStatement pt = ConexionSQLServer.getInstancia().getConexion().prepareStatement(query);
             ResultSet rs = pt.executeQuery()) {
             if (rs.next()){
-                return rs.getInt(1);
+                return rs.getInt(1); // -> 15
             }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null,e.getMessage(), "ERROR" , JOptionPane.WARNING_MESSAGE);

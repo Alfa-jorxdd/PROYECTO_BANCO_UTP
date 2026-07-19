@@ -54,18 +54,15 @@ public class OperacionPanel extends javax.swing.JPanel {
         consultaPanel.ingresarNumeroCuenta(numeroCuenta);
         MostarPanel(consultaPanel);
     }
-    
-    public void irTransferencia(String numeroCuenta){
-        MostarPanel(transferenciaPanel);
-    }
-    
-    public void irOperaciones(String numeroCuenta){
-        MostarPanel(registroOperacionesPanel);
-    }
 
     public Dashboard getDashboard() {
         return dashboard;
     }
+
+    public Operacion_RegistroOperacionesPanel getRegistroOperacionesPanel() {
+        return registroOperacionesPanel;
+    }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {

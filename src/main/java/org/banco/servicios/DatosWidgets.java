@@ -40,7 +40,11 @@ public class DatosWidgets {
         labelSaldo.setText(saldoRedondeado);
     }
 
-    private String redondearSaldo(BigDecimal saldo){
+    public void ponerUltimosClientesTabla(DefaultTableModel dtm) {
+        clienteDAO.listarUltimos20Clientes(dtm);
+    }
+
+    private String redondearSaldo(BigDecimal saldo) {
         String[] SUFIJOS = {"", "K", "M", "B", "T"};
         double valor = saldo.doubleValue();
         boolean negativo = valor < 0;
@@ -56,9 +60,5 @@ public class DatosWidgets {
         String resultado = df.format(valor) + SUFIJOS[indiceSufijos];
 
         return negativo ? "-" + resultado : resultado;
-    }
-    
-    public void ponerUltimosClientesTabla(DefaultTableModel dtm) {
-        clienteDAO.listarUltimos20Clientes(dtm);
     }
 }

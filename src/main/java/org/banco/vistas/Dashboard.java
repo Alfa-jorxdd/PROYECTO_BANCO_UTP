@@ -110,6 +110,7 @@ public final class Dashboard extends javax.swing.JFrame {
     public void actualizarDatosDelSistema(){
         cuentas.cargarListaCuentas();
         principal.cargarDatosWidgets();
+        operaciones.getRegistroOperacionesPanel().cargarOperacionesTabla();
     }
 
     @SuppressWarnings("unchecked")

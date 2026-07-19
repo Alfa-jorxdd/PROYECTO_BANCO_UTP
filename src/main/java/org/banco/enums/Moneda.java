@@ -1,11 +1,12 @@
 package org.banco.enums;
 
 public enum Moneda {
-    SOL(1.0, "S/"),
-    DOLAR(3.75, "$");
+    SOL (1.0, "S/"),
+    DOLAR (3.75, "$");
     
     private double tipoCambio;
     private String simbolo;
+
     Moneda(double tipoCambio, String simbolo){
         this.tipoCambio = tipoCambio;
         this.simbolo = simbolo;

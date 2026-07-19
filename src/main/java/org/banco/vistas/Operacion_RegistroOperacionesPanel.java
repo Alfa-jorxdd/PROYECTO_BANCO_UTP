@@ -30,12 +30,12 @@ public class Operacion_RegistroOperacionesPanel extends javax.swing.JPanel {
         txtBuscarPor.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                listarOperacionesTabla();
+                cargarOperacionesTabla();
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                listarOperacionesTabla();
+                cargarOperacionesTabla();
             }
 
             @Override
@@ -44,10 +44,10 @@ public class Operacion_RegistroOperacionesPanel extends javax.swing.JPanel {
             }
         });
         
-        listarOperacionesTabla();
+        cargarOperacionesTabla();
     }
     
-    private void listarOperacionesTabla(){
+    public void cargarOperacionesTabla(){
         mo.listar(dtm, ascendente, boxOrdenarPor.getSelectedIndex(), boxBuscarPor.getSelectedIndex(), txtBuscarPor.getText());
     }
 
@@ -220,7 +220,7 @@ public class Operacion_RegistroOperacionesPanel extends javax.swing.JPanel {
     private void btnAscDescActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAscDescActionPerformed
         ascendente = !ascendente;
         btnAscDesc.setText(ascendente ? "Asc" : "Desc");
-        listarOperacionesTabla();
+        cargarOperacionesTabla();
     }//GEN-LAST:event_btnAscDescActionPerformed
 
     private void btnReporteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReporteActionPerformed
